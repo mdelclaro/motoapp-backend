@@ -1,0 +1,20 @@
+{
+  "name": "api-backend",
+  "version": "1.0.0",
+  "description": "Moto App Backend",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon --delay 2 app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Matheus Del Claro",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "cors": "^2.8.5",
+    "express": "^4.16.4",
+    "express-validator": "^5.3.1",
+    "mongoose": "^5.4.12",
+    "nodemon": "^1.18.10"
+  }
+}
