@@ -4,7 +4,8 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 
 // Rotas
-const corridaRoutes = require("./src/routes/corrida");
+const corridaRoutes = require("./src/routes/corrida/");
+const clienteRoutes = require("./src/routes/usuario/cliente/");
 
 const app = express();
 
@@ -12,14 +13,15 @@ const app = express();
 app.use(cors());
 
 // bodyParser dos requests
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 // Rotas
-app.use("/motoapp", corridaRoutes);
+app.use("/motoapp/v1/corrida", corridaRoutes);
+app.use("/motoapp/v1/usuario/cliente", clienteRoutes);
 
 // tratamento de erros
 app.use((error, req, res, next) => {
-  console.log(error);
   const status = error.statusCode || 500;
   const message = error.message;
   res.status(status).json({ message });
@@ -34,4 +36,4 @@ mongoose
   .then(result => {
     app.listen(8080);
   })
-  .catch(err => console.log("erro: " + err));
+  .catch(err => console.log("erro mongo: " + err));
