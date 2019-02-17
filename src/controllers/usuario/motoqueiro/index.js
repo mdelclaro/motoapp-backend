@@ -2,18 +2,18 @@ const { validationResult } = require("express-validator/check");
 const ObjectId = require("mongoose").Types.ObjectId;
 const bcrypt = require("bcrypt");
 
-const Cliente = require("../../../models/usuario/cliente/");
+const Motoqueiro = require("../../../models/usuario/motoqueiro/");
 const errorHandling = require("../../../utils/error-handling/");
 
-// Buscar Clientes
-exports.getClientes = (req, res, next) => {
-  Cliente.find()
-    .then(clientes => {
-      if (!clientes) {
-        error = errorHandling.createError("Nenhum cliente encontrado.", 404);
+// Buscar Motoqueiros
+exports.getMotoqueiros = (req, res, next) => {
+  Motoqueiro.find()
+    .then(motoqueiros => {
+      if (!motoqueiros) {
+        error = errorHandling.createError("Nenhum motoqueiro encontrado.", 404);
         throw error;
       }
-      res.status(200).json({ message: "Sucesso", clientes });
+      res.status(200).json({ message: "Sucesso", motoqueiros });
     })
     .catch(err => {
       if (!err.statusCode) {
@@ -23,20 +23,20 @@ exports.getClientes = (req, res, next) => {
     });
 };
 
-// Buscar Cliente por ID
-exports.getCliente = (req, res, next) => {
-  const idCliente = req.params.idCliente;
-  if (!ObjectId.isValid(idCliente)) {
+// Buscar Motoqueiro por ID
+exports.getMotoqueiro = (req, res, next) => {
+  const idMotoqueiro = req.params.idMotoqueiro;
+  if (!ObjectId.isValid(idMotoqueiro)) {
     error = errorHandling.createError("ID invalido.", 422);
     throw error;
   }
-  Cliente.findById(idCliente)
-    .then(cliente => {
-      if (!cliente) {
-        error = errorHandling.createError("Nenhum cliente encontrado.", 404);
+  Motoqueiro.findById(idMotoqueiro)
+    .then(motoqueiro => {
+      if (!motoqueiro) {
+        error = errorHandling.createError("Nenhum motoqueiro encontrado.", 404);
         throw error;
       }
-      res.status(200).json({ message: "Sucesso", cliente });
+      res.status(200).json({ message: "Sucesso", motoqueiro });
     })
     .catch(err => {
       if (!err.statusCode) {
@@ -46,8 +46,8 @@ exports.getCliente = (req, res, next) => {
     });
 };
 
-// Criar Cliente
-exports.createCliente = (req, res, next) => {
+// Criar Motoqueiro
+exports.createMotoqueiro = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     error = errorHandling.createError("Validation Failed", 422);
@@ -56,12 +56,14 @@ exports.createCliente = (req, res, next) => {
   const nome = req.body.nome;
   const sobrenome = req.body.sobrenome;
   const email = req.body.email;
+  const cnh = req.body.cnh;
+  const placa = req.body.placa;
 
   // Checa se e-mail ja esta cadastrado
-  Cliente.findOne({ email })
-    .then(cliente => {
+  Motoqueiro.findOne({ email })
+    .then(motoqueiro => {
       // esta
-      if (cliente) {
+      if (motoqueiro) {
         error = errorHandling.createError("Email ja cadastrado", 422);
         throw error;
       }
@@ -70,22 +72,24 @@ exports.createCliente = (req, res, next) => {
       bcrypt.hash(req.body.senha, 10, (err, hash) => {
         const senha = hash;
         if (err) {
-          error = errorHandling.createError("Validation Failed", 422);
+          error = errorHandling.createError("Erro bcrypt", 422);
           throw error;
         }
-        const cliente = new Cliente({
+        const motoqueiro = new Motoqueiro({
           nome,
           sobrenome,
           email,
-          senha
+          senha,
+          cnh,
+          placa
         });
 
-        cliente
+        motoqueiro
           .save()
           .then(result => {
             res.status(201).json({
-              message: "Cliente criado com sucesso!",
-              cliente: result
+              message: "Motoqueiro criado com sucesso!",
+              motoqueiro: result
             });
           })
           .catch(err => {
@@ -99,43 +103,48 @@ exports.createCliente = (req, res, next) => {
     .catch(err => next(err));
 };
 
-// Atualizar Cliente
-exports.updateCliente = (req, res, next) => {
+// Atualizar Motoqueiro
+exports.updateMotoqueiro = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     error = errorHandling.createError("Validation Failed", 422);
     throw error;
   }
 
-  const idCliente = req.params.idCliente;
+  const idMotoqueiro = req.params.idMotoqueiro;
   const email = req.body.email;
   const senha = req.body.senha;
+  const placa = req.body.placa;
 
-  if (!ObjectId.isValid(idCliente)) {
+  if (!ObjectId.isValid(idMotoqueiro)) {
     error = errorHandling.createError("ID invalido.", 422);
     throw error;
   }
 
-  Cliente.findOne({ email })
-    .then(cliente => {
-      if (cliente) {
+  Motoqueiro.findOne({ email })
+    .then(motoqueiro => {
+      if (motoqueiro) {
         error = errorHandling.createError("Email ja cadastrado", 422);
         throw error;
       }
-      Cliente.findById(idCliente)
-        .then(cliente => {
-          if (!cliente) {
-            error = errorHandling.createError("Cliente nao encontrado.", 404);
+      Motoqueiro.findById(idMotoqueiro)
+        .then(motoqueiro => {
+          if (!motoqueiro) {
+            error = errorHandling.createError(
+              "Motoqueiro nao encontrado.",
+              404
+            );
             throw error;
           }
-          cliente.email = email ? email : cliente.email;
-          cliente.senha = senha ? senha : cliente.senha;
-          return cliente.save();
+          motoqueiro.email = email ? email : motoqueiro.email;
+          motoqueiro.senha = senha ? senha : motoqueiro.senha;
+          motoqueiro.placa = placa ? placa : motoqueiro.placa;
+          return motoqueiro.save();
         })
         .then(result => {
           res
             .status(200)
-            .json({ message: "Cliente Atualizado", cliente: result });
+            .json({ message: "Cliente Atualizado", motoqueiro: result });
         })
         .catch(err => {
           if (!err.statusCode) {

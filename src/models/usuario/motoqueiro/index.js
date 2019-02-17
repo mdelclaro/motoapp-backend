@@ -31,4 +31,4 @@ const motoqueiroSchema = new Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Cliente", motoqueiroSchema);
+module.exports = mongoose.model("Motoqueiro", motoqueiroSchema);
