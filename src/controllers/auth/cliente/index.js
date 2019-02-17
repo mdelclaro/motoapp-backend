@@ -1,6 +1,8 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
+const { privateKey } = require("../../../config");
+
 const Cliente = require("../../../models/usuario/cliente/");
 const errorHandling = require("../../../utils/error-handling/");
 
@@ -28,7 +30,7 @@ exports.login = (req, res, next) => {
           email: _cliente.email,
           userId: _cliente._id.toString()
         },
-        "secret",
+        privateKey,
         { expiresIn: "1h" }
       );
       res.status(200).json({ token, userId: _cliente._id.toString() });
