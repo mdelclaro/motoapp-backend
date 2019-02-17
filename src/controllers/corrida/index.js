@@ -2,6 +2,7 @@ const { validationResult } = require("express-validator/check");
 const ObjectId = require("mongoose").Types.ObjectId;
 
 const Corrida = require("../../models/corrida/");
+const Cliente = require("../../models/usuario/cliente/");
 const errorHandling = require("../../utils/error-handling/");
 
 // Buscar Corridas
@@ -57,8 +58,10 @@ exports.createCorrida = (req, res, next) => {
   const destino = req.body.destino;
   const distancia = req.body.distancia;
   const tempo = req.body.tempo;
-  const idCliente = req.body.idCliente;
+  const idCliente = req.userId;
   const status = 0;
+
+  let _cliente;
 
   const corrida = new Corrida({
     origem,
@@ -72,10 +75,18 @@ exports.createCorrida = (req, res, next) => {
   corrida
     .save()
     .then(result => {
-      console.log(result);
+      return Cliente.findById(req.userId);
+    })
+    .then(cliente => {
+      _cliente = cliente;
+      cliente.corridas.push(corrida);
+      return cliente.save();
+    })
+    .then(result => {
       res.status(201).json({
         message: "Corrida criada com sucesso!",
-        corrida: result
+        corrida,
+        cliente: { _id: _cliente._id, nome: _cliente.nome }
       });
     })
     .catch(err => {
@@ -101,14 +112,18 @@ exports.updateCorrida = (req, res, next) => {
     throw error;
   }
 
-  const idCorrida = req.body.idCorrida;
+  const idCorrida = req.params.idCorrida;
   const idMotoqueiro = req.body.idMotoqueiro || null;
   const status = req.body.status || null;
 
   Corrida.findById(idCorrida)
     .then(corrida => {
       if (!corrida) {
-        error = errorHandling.createError("Corrida nao encontrada", 422);
+        error = errorHandling.createError("Corrida nao encontrada", 404);
+        throw error;
+      }
+      if (corrida.idCliente.toString() !== req.userId) {
+        error = errorHandling.createError("Not authorized", 403);
         throw error;
       }
       corrida.idMotoqueiro = idMotoqueiro ? idMotoqueiro : corrida.idMotoqueiro;
@@ -122,6 +137,39 @@ exports.updateCorrida = (req, res, next) => {
       if (!err.statusCode) {
         err.statusCode = 500;
       }
+      next(err);
+    });
+};
+
+exports.deleteCorrida = (req, res, next) => {
+  const idCorrida = req.params.idCorrida;
+  if (!ObjectId.isValid(idCorrida)) {
+    error = errorHandling.createError("ID invalido.", 422);
+    throw error;
+  }
+  Corrida.findById(idCorrida)
+    .then(corrida => {
+      if (!corrida) {
+        error = errorHandling.createError("Nenhuma corrida encontrada", 404);
+        throw error;
+      }
+      if (corrida.idCliente.toString() !== req.userId) {
+        error = errorHandling.createError("Not authorized", 403);
+        throw error;
+      }
+      return Corrida.findByIdAndRemove(idCorrida);
+    })
+    .then(result => {
+      return Cliente.findById(req.userId);
+    })
+    .then(cliente => {
+      cliente.corridas.pull(idCorrida);
+      return cliente.save();
+    })
+    .then(result => {
+      res.status(200).json({ message: "Deleted" });
+    })
+    .catch(err => {
       next(err);
     });
 };

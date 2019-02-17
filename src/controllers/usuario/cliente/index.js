@@ -50,60 +50,49 @@ exports.getCliente = (req, res, next) => {
 exports.createCliente = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    error = errorHandling.createError("Validation Failed", 422);
+    error = errorHandling.createError("Validation Failed", 422, errors);
     throw error;
   }
   const nome = req.body.nome;
   const sobrenome = req.body.sobrenome;
   const email = req.body.email;
 
-  // Checa se e-mail ja esta cadastrado
-  Cliente.findOne({ email })
-    .then(cliente => {
-      // esta
-      if (cliente) {
-        error = errorHandling.createError("Email ja cadastrado", 422);
-        throw error;
-      }
+  // encripta senha
+  bcrypt.hash(req.body.senha, 10, (err, hash) => {
+    const senha = hash;
+    if (err) {
+      error = errorHandling.createError("Encrypt Failed", 422);
+      throw error;
+    }
+    const cliente = new Cliente({
+      nome,
+      sobrenome,
+      email,
+      senha
+    });
 
-      // nao esta
-      bcrypt.hash(req.body.senha, 10, (err, hash) => {
-        const senha = hash;
-        if (err) {
-          error = errorHandling.createError("Validation Failed", 422);
-          throw error;
-        }
-        const cliente = new Cliente({
-          nome,
-          sobrenome,
-          email,
-          senha
+    cliente
+      .save()
+      .then(result => {
+        res.status(201).json({
+          message: "Cliente criado com sucesso!",
+          cliente: result
         });
-
-        cliente
-          .save()
-          .then(result => {
-            res.status(201).json({
-              message: "Cliente criado com sucesso!",
-              cliente: result
-            });
-          })
-          .catch(err => {
-            if (!err.statusCode) {
-              err.statusCode = 500;
-            }
-            next(err);
-          });
+      })
+      .catch(err => {
+        if (!err.statusCode) {
+          err.statusCode = 500;
+        }
+        next(err);
       });
-    })
-    .catch(err => next(err));
+  });
 };
 
 // Atualizar Cliente
 exports.updateCliente = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    error = errorHandling.createError("Validation Failed", 422);
+    error = errorHandling.createError("Validation Failed", 422, errors);
     throw error;
   }
 
@@ -116,33 +105,35 @@ exports.updateCliente = (req, res, next) => {
     throw error;
   }
 
-  Cliente.findOne({ email })
+  Cliente.findById(idCliente)
     .then(cliente => {
-      if (cliente) {
-        error = errorHandling.createError("Email ja cadastrado", 422);
+      if (!cliente) {
+        error = errorHandling.createError("Cliente nao encontrado.", 404);
         throw error;
       }
-      Cliente.findById(idCliente)
-        .then(cliente => {
-          if (!cliente) {
-            error = errorHandling.createError("Cliente nao encontrado.", 404);
+      // altera email
+      cliente.email = email ? email : cliente.email;
+
+      // altera senha
+      if (senha) {
+        bcrypt.hash(senha, 10, (err, hash) => {
+          if (err) {
+            error = errorHandling.createError("Encrypt Failed", 422);
             throw error;
           }
-          cliente.email = email ? email : cliente.email;
-          cliente.senha = senha ? senha : cliente.senha;
-          return cliente.save();
-        })
-        .then(result => {
-          res
-            .status(200)
-            .json({ message: "Cliente Atualizado", cliente: result });
-        })
-        .catch(err => {
-          if (!err.statusCode) {
-            err.statusCode = 500;
-          }
-          next(err);
+          cliente.senha = hash;
         });
+      }
+
+      return cliente.save();
     })
-    .catch(err => next(err));
+    .then(result => {
+      res.status(200).json({ message: "Cliente Atualizado", cliente: result });
+    })
+    .catch(err => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+    });
 };

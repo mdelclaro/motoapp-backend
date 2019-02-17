@@ -18,7 +18,13 @@ const clienteSchema = new Schema(
     senha: {
       type: String,
       required: true
-    }
+    },
+    corridas: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Corrida"
+      }
+    ]
   },
   { timestamps: true }
 );

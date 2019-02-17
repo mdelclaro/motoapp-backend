@@ -28,7 +28,8 @@ const corridaSchema = new Schema(
       required: true
     },
     idCliente: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref: "Cliente",
       required: true
     },
     idMotoqueiro: {

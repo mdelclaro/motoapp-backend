@@ -1,14 +1,16 @@
 const express = require("express");
-const { body } = require("express-validator/check");
+const { body, param } = require("express-validator/check");
+
 const corridaController = require("../../controllers/corrida/");
+const auth = require("../../utils/auth/");
 
 const router = express.Router();
 
 // GET motoapp/v1/corrida/id
-router.get("/:idCorrida", corridaController.getCorrida);
+router.get("/:idCorrida", auth, corridaController.getCorrida);
 
 // GET motoapp/v1/corrida/
-router.get("/", corridaController.getCorridas);
+router.get("/", auth, corridaController.getCorridas);
 
 // POST motoapp/v1/corrida/
 router.post(
@@ -20,28 +22,23 @@ router.post(
     body("destino")
       .not()
       .isEmpty(),
-    body("idCliente")
-      .not()
-      .isEmpty()
-      .trim()
-      .escape(),
     body("status")
       .not()
       .isEmpty()
       .trim()
       .escape()
   ],
+  auth,
   corridaController.createCorrida
 );
 
+// PUT motoapp/v1/corrida/id
 router.put(
-  "/",
+  "/:idCorrida",
   [
-    body("idCorrida")
+    param("idCorrida")
       .not()
-      .isEmpty()
-      .trim()
-      .escape(),
+      .isEmpty(),
     body("idMotoqueiro")
       .trim()
       .escape(),
@@ -49,7 +46,11 @@ router.put(
       .trim()
       .escape()
   ],
+  auth,
   corridaController.updateCorrida
 );
+
+// DELETE motoapp/v1/corrida/id
+router.delete("/:idCorrida", auth, corridaController.deleteCorrida);
 
 module.exports = router;

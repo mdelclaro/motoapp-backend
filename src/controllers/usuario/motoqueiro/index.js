@@ -50,7 +50,7 @@ exports.getMotoqueiro = (req, res, next) => {
 exports.createMotoqueiro = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    error = errorHandling.createError("Validation Failed", 422);
+    error = errorHandling.createError("Validation Failed", 422, errors);
     throw error;
   }
   const nome = req.body.nome;
@@ -59,55 +59,43 @@ exports.createMotoqueiro = (req, res, next) => {
   const cnh = req.body.cnh;
   const placa = req.body.placa;
 
-  // Checa se e-mail ja esta cadastrado
-  Motoqueiro.findOne({ email })
-    .then(motoqueiro => {
-      // esta
-      if (motoqueiro) {
-        error = errorHandling.createError("Email ja cadastrado", 422);
-        throw error;
-      }
+  bcrypt.hash(req.body.senha, 10, (err, hash) => {
+    const senha = hash;
+    if (err) {
+      error = errorHandling.createError("Erro bcrypt", 422);
+      throw error;
+    }
+    const motoqueiro = new Motoqueiro({
+      nome,
+      sobrenome,
+      email,
+      senha,
+      cnh,
+      placa
+    });
 
-      // nao esta
-      bcrypt.hash(req.body.senha, 10, (err, hash) => {
-        const senha = hash;
-        if (err) {
-          error = errorHandling.createError("Erro bcrypt", 422);
-          throw error;
-        }
-        const motoqueiro = new Motoqueiro({
-          nome,
-          sobrenome,
-          email,
-          senha,
-          cnh,
-          placa
+    motoqueiro
+      .save()
+      .then(result => {
+        res.status(201).json({
+          message: "Motoqueiro criado com sucesso!",
+          motoqueiro: result
         });
-
-        motoqueiro
-          .save()
-          .then(result => {
-            res.status(201).json({
-              message: "Motoqueiro criado com sucesso!",
-              motoqueiro: result
-            });
-          })
-          .catch(err => {
-            if (!err.statusCode) {
-              err.statusCode = 500;
-            }
-            next(err);
-          });
+      })
+      .catch(err => {
+        if (!err.statusCode) {
+          err.statusCode = 500;
+        }
+        next(err);
       });
-    })
-    .catch(err => next(err));
+  });
 };
 
 // Atualizar Motoqueiro
 exports.updateMotoqueiro = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    error = errorHandling.createError("Validation Failed", 422);
+    error = errorHandling.createError("Validation Failed", 422, errors);
     throw error;
   }
 
@@ -121,37 +109,39 @@ exports.updateMotoqueiro = (req, res, next) => {
     throw error;
   }
 
-  Motoqueiro.findOne({ email })
+  Motoqueiro.findById(idMotoqueiro)
     .then(motoqueiro => {
-      if (motoqueiro) {
-        error = errorHandling.createError("Email ja cadastrado", 422);
+      if (!motoqueiro) {
+        error = errorHandling.createError("Motoqueiro nao encontrado.", 404);
         throw error;
       }
-      Motoqueiro.findById(idMotoqueiro)
-        .then(motoqueiro => {
-          if (!motoqueiro) {
-            error = errorHandling.createError(
-              "Motoqueiro nao encontrado.",
-              404
-            );
+
+      // altera email e placa
+      motoqueiro.email = email ? email : motoqueiro.email;
+      motoqueiro.placa = placa ? placa : motoqueiro.placa;
+
+      // altera senha
+      if (senha) {
+        bcrypt.hash(senha, 10, (err, hash) => {
+          if (err) {
+            error = errorHandling.createError("Encrypt Failed", 422);
             throw error;
           }
-          motoqueiro.email = email ? email : motoqueiro.email;
-          motoqueiro.senha = senha ? senha : motoqueiro.senha;
-          motoqueiro.placa = placa ? placa : motoqueiro.placa;
-          return motoqueiro.save();
-        })
-        .then(result => {
-          res
-            .status(200)
-            .json({ message: "Cliente Atualizado", motoqueiro: result });
-        })
-        .catch(err => {
-          if (!err.statusCode) {
-            err.statusCode = 500;
-          }
-          next(err);
+          cliente.senha = hash;
         });
+      }
+
+      return motoqueiro.save();
     })
-    .catch(err => next(err));
+    .then(result => {
+      res
+        .status(200)
+        .json({ message: "Cliente Atualizado", motoqueiro: result });
+    })
+    .catch(err => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+    });
 };
