@@ -1,6 +1,8 @@
 const { validationResult } = require("express-validator/check");
 const ObjectId = require("mongoose").Types.ObjectId;
 
+const io = require("../../utils/socket/");
+
 const Corrida = require("../../models/corrida/");
 const Cliente = require("../../models/usuario/cliente/");
 const errorHandling = require("../../utils/error-handling/");
@@ -75,6 +77,9 @@ exports.createCorrida = async (req, res, next) => {
     const cliente = await Cliente.findById(req.userId);
     cliente.corridas.push(corrida);
     await cliente.save();
+
+    io.getIO().emit("corrida", { action: "create", corrida });
+
     res.status(201).json({
       message: "Corrida criada com sucesso!",
       corrida,

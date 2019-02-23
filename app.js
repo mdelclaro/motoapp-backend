@@ -7,6 +7,7 @@ const bodyParser = require("body-parser");
 const corridaRoutes = require("./src/routes/corrida/");
 const clienteRoutes = require("./src/routes/usuario/cliente/");
 const motoqueiroRoutes = require("./src/routes/usuario/motoqueiro/");
+const motoqueiroLocationRoutes = require("./src/routes/location/");
 const authRoute = require("./src/routes/auth/");
 
 const app = express();
@@ -22,6 +23,7 @@ app.use(bodyParser.json());
 app.use("/motoapp/v1/corrida", corridaRoutes);
 app.use("/motoapp/v1/usuario/cliente", clienteRoutes);
 app.use("/motoapp/v1/usuario/motoqueiro", motoqueiroRoutes);
+app.use("/motoapp/v1/localizacao", motoqueiroLocationRoutes);
 app.use("/motoapp/v1/auth", authRoute);
 
 // tratamento de erros
@@ -43,6 +45,10 @@ mongoose
     { useNewUrlParser: true }
   )
   .then(result => {
-    app.listen(8080);
+    const server = app.listen(8080);
+    const io = require("./src/utils/socket/").init(server);
+    io.on("connection", socket => {
+      console.log("Connected");
+    });
   })
   .catch(err => console.log("erro mongo: " + err));

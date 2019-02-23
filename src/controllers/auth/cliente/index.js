@@ -27,7 +27,7 @@ exports.login = async (req, res, next) => {
         userId: cliente._id.toString()
       },
       privateKey,
-      { expiresIn: "1h" }
+      { expiresIn: "50h" }
     );
     res.status(200).json({ token, userId: cliente._id.toString() });
   } catch (err) {
