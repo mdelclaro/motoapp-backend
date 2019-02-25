@@ -26,14 +26,13 @@ exports.getCorridas = async (req, res, next) => {
 
 // Buscar Corrida por ID
 exports.getCorrida = async (req, res, next) => {
-  const idCorrida = req.params.idCorrida;
-
-  if (!ObjectId.isValid(idCorrida)) {
-    error = errorHandling.createError("ID invalido", 422);
-    throw error;
-  }
-
   try {
+    const idCorrida = req.params.idCorrida;
+
+    if (!ObjectId.isValid(idCorrida)) {
+      error = errorHandling.createError("ID invalido", 422);
+      throw error;
+    }
     const corrida = await Corrida.findById(idCorrida);
     if (!corrida) {
       error = errorHandling.createError("Nenhuma corrida encontrada.", 404);
@@ -50,29 +49,32 @@ exports.getCorrida = async (req, res, next) => {
 
 // Criar Corrida
 exports.createCorrida = async (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    error = errorHandling.createError("Validation Failed", 422);
-    throw error;
-  }
-
-  const origem = req.body.origem;
-  const destino = req.body.destino;
-  const distancia = req.body.distancia;
-  const tempo = req.body.tempo;
-  const idCliente = req.userId;
-  const status = 0;
-
-  const corrida = new Corrida({
-    origem,
-    destino,
-    distancia,
-    tempo,
-    idCliente,
-    status
-  });
-
   try {
+    const errors = validationResult(req);
+    console.log(req.body);
+    if (!errors.isEmpty()) {
+      error = errorHandling.createError(
+        "Validation Failed (createCorrida)",
+        422
+      );
+      throw error;
+    }
+
+    const origem = req.body.origem;
+    const destino = req.body.destino;
+    const distancia = req.body.distancia;
+    const tempo = req.body.tempo;
+    const idCliente = req.userId;
+    const status = 0;
+
+    const corrida = new Corrida({
+      origem,
+      destino,
+      distancia,
+      tempo,
+      idCliente,
+      status
+    });
     await corrida.save();
     const cliente = await Cliente.findById(req.userId);
     cliente.corridas.push(corrida);
@@ -95,24 +97,23 @@ exports.createCorrida = async (req, res, next) => {
 
 // Atualizar Corrida
 exports.updateCorrida = async (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    error = errorHandling.createError("Validation Failed", 422);
-    throw error;
-  }
-  if (!req.body.status) {
-    error = errorHandling.createError(
-      "Required parameter (status) not provided",
-      422
-    );
-    throw error;
-  }
-
-  const idCorrida = req.params.idCorrida;
-  const idMotoqueiro = req.body.idMotoqueiro || null;
-  const status = req.body.status || null;
-
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      error = errorHandling.createError("Validation Failed", 422);
+      throw error;
+    }
+    if (!req.body.status) {
+      error = errorHandling.createError(
+        "Required parameter (status) not provided",
+        422
+      );
+      throw error;
+    }
+
+    const idCorrida = req.params.idCorrida;
+    const idMotoqueiro = req.body.idMotoqueiro || null;
+    const status = req.body.status || null;
     const corrida = await Corrida.findById(idCorrida);
     if (!corrida) {
       error = errorHandling.createError("Corrida nao encontrada", 404);
@@ -136,12 +137,17 @@ exports.updateCorrida = async (req, res, next) => {
 
 // Deletar Corrida
 exports.deleteCorrida = async (req, res, next) => {
-  const idCorrida = req.params.idCorrida;
-  if (!ObjectId.isValid(idCorrida)) {
-    error = errorHandling.createError("ID invalido.", 422);
-    throw error;
-  }
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      error = errorHandling.createError("Validation Failed", 422);
+      throw error;
+    }
+    const idCorrida = req.params.idCorrida;
+    if (!ObjectId.isValid(idCorrida)) {
+      error = errorHandling.createError("ID invalido.", 422);
+      throw error;
+    }
     const corrida = await Corrida.findById(idCorrida);
     if (!corrida) {
       error = errorHandling.createError("Nenhuma corrida encontrada", 404);
@@ -151,11 +157,16 @@ exports.deleteCorrida = async (req, res, next) => {
       error = errorHandling.createError("Not authorized", 403);
       throw error;
     }
-    await Corrida.findByIdAndRemove(idCorrida);
-    const cliente = await Cliente.findById(req.userId);
-    cliente.corridas.pull(idCorrida);
-    await cliente.save();
-    res.status(200).json({ message: "Deleted" });
+    if (!corrida.idMotoqueiro) {
+      await Corrida.findByIdAndRemove(idCorrida);
+      const cliente = await Cliente.findById(req.userId);
+      cliente.corridas.pull(idCorrida);
+      await cliente.save();
+      res.status(200).json({ message: "Deleted" });
+    } else {
+      error = errorHandling.createError("Esta corrida já foi aceita!", 422);
+      throw error;
+    }
   } catch (err) {
     next(err);
   }

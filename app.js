@@ -3,6 +3,8 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 
+const { mongoPwd } = require("./src/config");
+
 // Rotas
 const corridaRoutes = require("./src/routes/corrida/");
 const clienteRoutes = require("./src/routes/usuario/cliente/");
@@ -41,7 +43,7 @@ app.use((req, res) => {
 // mongoDB
 mongoose
   .connect(
-    "mongodb+srv://mdelclaro:Copp1234@cluster0-jjfdi.mongodb.net/motoapp?retryWrites=true",
+    `mongodb+srv://mdelclaro:${mongoPwd}@cluster0-jjfdi.mongodb.net/motoapp?retryWrites=true`,
     { useNewUrlParser: true }
   )
   .then(result => {

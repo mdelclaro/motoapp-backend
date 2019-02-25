@@ -24,9 +24,13 @@ router.post(
       .isEmpty(),
     body("status")
       .not()
+      .isEmpty(),
+    body("distancia")
+      .not()
+      .isEmpty(),
+    body("tempo")
+      .not()
       .isEmpty()
-      .trim()
-      .escape()
   ],
   auth,
   corridaController.createCorrida
@@ -51,6 +55,15 @@ router.put(
 );
 
 // DELETE motoapp/v1/corrida/id
-router.delete("/:idCorrida", auth, corridaController.deleteCorrida);
+router.delete(
+  "/:idCorrida",
+  [
+    param("idCorrida")
+      .not()
+      .isEmpty()
+  ],
+  auth,
+  corridaController.deleteCorrida
+);
 
 module.exports = router;
