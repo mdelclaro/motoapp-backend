@@ -7,10 +7,10 @@ const Motoqueiro = require("../../../models/usuario/motoqueiro/");
 const errorHandling = require("../../../utils/error-handling/");
 
 exports.login = async (req, res, next) => {
-  const email = req.body.email;
-  const senha = req.body.senha;
-
   try {
+    const email = req.body.email;
+    const senha = req.body.senha;
+
     const motoqueiro = await Motoqueiro.findOne({ email });
     if (!motoqueiro) {
       const error = errorHandling.createError("E-mail nao cadastrado", 401);

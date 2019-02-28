@@ -48,8 +48,13 @@ mongoose
   )
   .then(result => {
     const server = app.listen(8080);
+    let clients = [];
     const io = require("./src/utils/socket/").init(server);
-    io.on("connection", socket => {
+    io.sockets.on("connection", socket => {
+      socket.on("join", data => {
+        console.log("join " + data.id);
+        socket.join(data.id);
+      });
       console.log("Connected");
     });
   })

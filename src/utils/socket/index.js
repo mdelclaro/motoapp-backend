@@ -1,4 +1,5 @@
 let io;
+let clients = [];
 
 module.exports = {
   init: httpServer => {

@@ -24,13 +24,12 @@ exports.getClientes = async (req, res, next) => {
 
 // Buscar Cliente por ID
 exports.getCliente = async (req, res, next) => {
-  const idCliente = req.params.idCliente;
-  if (!ObjectId.isValid(idCliente)) {
-    error = errorHandling.createError("ID invalido.", 422);
-    throw error;
-  }
-
   try {
+    const idCliente = req.params.idCliente;
+    if (!ObjectId.isValid(idCliente)) {
+      error = errorHandling.createError("ID invalido.", 422);
+      throw error;
+    }
     const cliente = await Cliente.findById(idCliente);
     if (!cliente) {
       error = errorHandling.createError("Nenhum cliente encontrado.", 404);
@@ -47,17 +46,17 @@ exports.getCliente = async (req, res, next) => {
 
 // Criar Cliente
 exports.createCliente = async (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    error = errorHandling.createError("Validation Failed", 422, errors);
-    throw error;
-  }
-
-  const nome = req.body.nome;
-  const sobrenome = req.body.sobrenome;
-  const email = req.body.email;
-
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      error = errorHandling.createError("Validation Failed", 422, errors);
+      throw error;
+    }
+
+    const nome = req.body.nome;
+    const sobrenome = req.body.sobrenome;
+    const email = req.body.email;
+
     // encripta senha
     const senha = await bcrypt.hash(req.body.senha, 10);
 
@@ -83,22 +82,22 @@ exports.createCliente = async (req, res, next) => {
 
 // Atualizar Cliente
 exports.updateCliente = async (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    error = errorHandling.createError("Validation Failed", 422, errors);
-    throw error;
-  }
-
-  const idCliente = req.params.idCliente;
-  const email = req.body.email;
-  const senha = req.body.senha;
-
-  if (!ObjectId.isValid(idCliente)) {
-    error = errorHandling.createError("ID invalido.", 422);
-    throw error;
-  }
-
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      error = errorHandling.createError("Validation Failed", 422, errors);
+      throw error;
+    }
+
+    const idCliente = req.params.idCliente;
+    const email = req.body.email;
+    const senha = req.body.senha;
+
+    if (!ObjectId.isValid(idCliente)) {
+      error = errorHandling.createError("ID invalido.", 422);
+      throw error;
+    }
+
     const cliente = await Cliente.findById(idCliente);
     if (!cliente) {
       error = errorHandling.createError("Cliente nao encontrado.", 404);

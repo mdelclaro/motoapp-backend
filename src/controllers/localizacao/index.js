@@ -25,14 +25,14 @@ exports.getMotoqueiroLocations = async (req, res, next) => {
 
 // Buscar Location de um motoqueiro
 exports.getMotoqueiroLocation = async (req, res, next) => {
-  const idMotoqueiro = req.params.idMotoqueiro;
-
-  if (!ObjectId.isValid(idMotoqueiro)) {
-    error = errorHandling.createError("ID invalido", 422);
-    throw error;
-  }
-
   try {
+    const idMotoqueiro = req.params.idMotoqueiro;
+
+    if (!ObjectId.isValid(idMotoqueiro)) {
+      error = errorHandling.createError("ID invalido", 422);
+      throw error;
+    }
+
     const location = await MotoqueiroLocation.findOne({ idMotoqueiro });
     if (!location) {
       error = errorHandling.createError(
@@ -52,21 +52,21 @@ exports.getMotoqueiroLocation = async (req, res, next) => {
 
 // Cria localizacao do motoqueiro
 exports.createMotoqueiroLocation = async (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    error = errorHandling.createError("Validation Failed", 422);
-    throw error;
-  }
-
-  const location = req.body.location;
-  const idMotoqueiro = req.body.idMotoqueiro;
-
-  const motoqueiroLocation = new MotoqueiroLocation({
-    idMotoqueiro,
-    location
-  });
-
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      error = errorHandling.createError("Validation Failed", 422);
+      throw error;
+    }
+
+    const location = req.body.location;
+    const idMotoqueiro = req.body.idMotoqueiro;
+
+    const motoqueiroLocation = new MotoqueiroLocation({
+      idMotoqueiro,
+      location
+    });
+
     const result = await motoqueiroLocation.save();
 
     io.getIO().emit("motoqueiroLocation", {
@@ -88,16 +88,16 @@ exports.createMotoqueiroLocation = async (req, res, next) => {
 
 // Atualizar motoqueiro location
 exports.updateMotoqueiroLocation = async (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    error = errorHandling.createError("Validation Failed", 422);
-    throw error;
-  }
-
-  const location = req.body.location;
-  const idMotoqueiro = req.params.idMotoqueiro;
-
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      error = errorHandling.createError("Validation Failed", 422);
+      throw error;
+    }
+
+    const location = req.body.location;
+    const idMotoqueiro = req.params.idMotoqueiro;
+
     const motoqueiroLocation = await MotoqueiroLocation.findOne({
       idMotoqueiro
     });

@@ -5,6 +5,7 @@ const io = require("../../utils/socket/");
 
 const Corrida = require("../../models/corrida/");
 const Cliente = require("../../models/usuario/cliente/");
+const Motoqueiro = require("../../models/usuario/motoqueiro/");
 const errorHandling = require("../../utils/error-handling/");
 
 // Buscar Corridas
@@ -51,7 +52,7 @@ exports.getCorrida = async (req, res, next) => {
 exports.createCorrida = async (req, res, next) => {
   try {
     const errors = validationResult(req);
-    console.log(req.body);
+    //console.log(req.body);
     if (!errors.isEmpty()) {
       error = errorHandling.createError(
         "Validation Failed (createCorrida)",
@@ -80,8 +81,7 @@ exports.createCorrida = async (req, res, next) => {
     cliente.corridas.push(corrida);
     await cliente.save();
 
-    io.getIO().emit("corrida", { action: "create", corrida });
-
+    //io.getIO().emit("corrida", { action: "create", corrida });
     res.status(201).json({
       message: "Corrida criada com sucesso!",
       corrida,
@@ -111,6 +111,7 @@ exports.updateCorrida = async (req, res, next) => {
       throw error;
     }
 
+    const idCliente = req.userId;
     const idCorrida = req.params.idCorrida;
     const idMotoqueiro = req.body.idMotoqueiro || null;
     const status = req.body.status || null;
@@ -126,6 +127,18 @@ exports.updateCorrida = async (req, res, next) => {
     corrida.idMotoqueiro = idMotoqueiro ? idMotoqueiro : corrida.idMotoqueiro;
     corrida.status = status ? status : corrida.status;
     const result = await corrida.save();
+
+    if (idMotoqueiro) {
+      const motoqueiro = await Motoqueiro.findById(idMotoqueiro);
+      if (!motoqueiro) {
+        error = errorHandling.createError("Id motoqueiro invalido.", 404);
+        throw error;
+      }
+      let socket = io.getIO();
+      socket.sockets.in("123").emit("acceptCorrida", { motoqueiro });
+      //TODO colocar idCliente
+    }
+
     res.status(200).json({ message: "Corrida Atualizada", corrida: result });
   } catch (err) {
     if (!err.statusCode) {

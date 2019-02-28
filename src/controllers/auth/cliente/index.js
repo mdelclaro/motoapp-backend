@@ -7,10 +7,10 @@ const Cliente = require("../../../models/usuario/cliente/");
 const errorHandling = require("../../../utils/error-handling/");
 
 exports.login = async (req, res, next) => {
-  const email = req.body.email;
-  const senha = req.body.senha;
-
   try {
+    const email = req.body.email;
+    const senha = req.body.senha;
+
     const cliente = await Cliente.findOne({ email });
     if (!cliente) {
       const error = errorHandling.createError("E-mail nao cadastrado", 401);
@@ -27,7 +27,7 @@ exports.login = async (req, res, next) => {
         userId: cliente._id.toString()
       },
       privateKey,
-      { expiresIn: "50h" }
+      { expiresIn: "5000h" }
     );
     res.status(200).json({ token, userId: cliente._id.toString() });
   } catch (err) {

@@ -24,12 +24,12 @@ exports.getMotoqueiros = async (req, res, next) => {
 
 // Buscar Motoqueiro por ID
 exports.getMotoqueiro = async (req, res, next) => {
-  const idMotoqueiro = req.params.idMotoqueiro;
-  if (!ObjectId.isValid(idMotoqueiro)) {
-    error = errorHandling.createError("ID invalido.", 422);
-    throw error;
-  }
   try {
+    const idMotoqueiro = req.params.idMotoqueiro;
+    if (!ObjectId.isValid(idMotoqueiro)) {
+      error = errorHandling.createError("ID invalido.", 422);
+      throw error;
+    }
     const motoqueiro = await Motoqueiro.findById(idMotoqueiro);
     if (!motoqueiro) {
       error = errorHandling.createError("Nenhum motoqueiro encontrado.", 404);
@@ -46,18 +46,17 @@ exports.getMotoqueiro = async (req, res, next) => {
 
 // Criar Motoqueiro
 exports.createMotoqueiro = async (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    error = errorHandling.createError("Validation Failed", 422, errors);
-    throw error;
-  }
-  const nome = req.body.nome;
-  const sobrenome = req.body.sobrenome;
-  const email = req.body.email;
-  const cnh = req.body.cnh;
-  const placa = req.body.placa;
-
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      error = errorHandling.createError("Validation Failed", 422, errors);
+      throw error;
+    }
+    const nome = req.body.nome;
+    const sobrenome = req.body.sobrenome;
+    const email = req.body.email;
+    const cnh = req.body.cnh;
+    const placa = req.body.placa;
     const senha = await bcrypt.hash(req.body.senha, 10);
     const motoqueiro = new Motoqueiro({
       nome,
@@ -82,23 +81,23 @@ exports.createMotoqueiro = async (req, res, next) => {
 
 // Atualizar Motoqueiro
 exports.updateMotoqueiro = async (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    error = errorHandling.createError("Validation Failed", 422, errors);
-    throw error;
-  }
-
-  const idMotoqueiro = req.params.idMotoqueiro;
-  const email = req.body.email;
-  const senha = req.body.senha;
-  const placa = req.body.placa;
-
-  if (!ObjectId.isValid(idMotoqueiro)) {
-    error = errorHandling.createError("ID invalido.", 422);
-    throw error;
-  }
-
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      error = errorHandling.createError("Validation Failed", 422, errors);
+      throw error;
+    }
+
+    const idMotoqueiro = req.params.idMotoqueiro;
+    const email = req.body.email;
+    const senha = req.body.senha;
+    const placa = req.body.placa;
+
+    if (!ObjectId.isValid(idMotoqueiro)) {
+      error = errorHandling.createError("ID invalido.", 422);
+      throw error;
+    }
+
     const motoqueiro = await Motoqueiro.findById(idMotoqueiro);
     if (!motoqueiro) {
       error = errorHandling.createError("Motoqueiro nao encontrado.", 404);
