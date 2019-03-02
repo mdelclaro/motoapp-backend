@@ -61,13 +61,7 @@ exports.login = async (req, res, next) => {
 exports.refreshToken = async (req, res, next) => {
   try {
     const refreshToken = req.body.refreshToken;
-    const email = req.body.email;
-
-    const cliente = await Cliente.findOne({ email });
-    if (!cliente) {
-      const error = errorHandling.createError("E-mail nao cadastrado", 401);
-      throw error;
-    }
+    let decodedToken;
 
     try {
       decodedToken = jwt.verify(refreshToken, refreshTokenPublicKey);
@@ -76,6 +70,13 @@ exports.refreshToken = async (req, res, next) => {
       err.statusCode = 500;
       throw err;
     }
+    const email = decodedToken.email;
+    const cliente = await Cliente.findOne({ email });
+    if (!cliente) {
+      const error = errorHandling.createError("E-mail nao cadastrado", 401);
+      throw error;
+    }
+
     const token = jwt.sign(
       {
         email: cliente.email,
