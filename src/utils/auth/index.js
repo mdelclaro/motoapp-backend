@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const errorHandling = require("../error-handling/");
-const { privateKey } = require("../../config");
+const { publicKey } = require("../../config");
 
 module.exports = (req, res, next) => {
   const authHeader = req.get("Authorization");
@@ -11,9 +11,11 @@ module.exports = (req, res, next) => {
   const token = authHeader.split(" ")[1];
   let decodedToken;
   try {
-    decodedToken = jwt.verify(token, privateKey);
+    decodedToken = jwt.verify(token, publicKey, { algorithms: "RS256" });
   } catch (err) {
-    err.message = "Invalid Token";
+    if (!err.message === "jwt expired") {
+      err.message = "Invalid Token";
+    }
     err.statusCode = 500;
     throw err;
   }
