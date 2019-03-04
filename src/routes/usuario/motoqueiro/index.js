@@ -26,17 +26,15 @@ router.post(
       .isLength({ min: 3 }),
     body("email")
       .isEmail()
-      .custom(async (email, { req }) => {
-        const motoqueiro = await Motoqueiro.findOne({ email });
-        if (motoqueiro) {
-          return Promise.reject("E-mail em uso");
-        }
-      })
       .normalizeEmail(),
     body("senha")
       .trim()
       .isLength({ min: 4 }),
     body("cnh")
+      .trim()
+      .not()
+      .isEmpty(),
+    body("moto")
       .trim()
       .not()
       .isEmpty(),
@@ -57,16 +55,14 @@ router.put(
       .isEmpty(),
     body("email")
       .isEmail()
-      .custom(async (email, { req }) => {
-        const motoqueiro = await Motoqueiro.findOne({ email });
-        if (motoqueiro) {
-          return Promise.reject("E-mail em uso");
-        }
-      })
       .normalizeEmail(),
     body("senha")
       .trim()
       .isLength({ min: 4 }),
+    body("moto")
+      .trim()
+      .not()
+      .isEmpty(),
     body("placa")
       .trim()
       .not()

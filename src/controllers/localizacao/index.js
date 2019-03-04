@@ -110,9 +110,10 @@ exports.updateMotoqueiroLocation = async (req, res, next) => {
 
     const result = await motoqueiroLocation.save();
 
-    io.getIO().emit("motoqueiroLocation", {
-      action: "update",
-      motoqueiroLocation
+    let socket = io.getIO();
+    socket.sockets.in(idMotoqueiro).emit("locationChanged", {
+      coords: location
+      // duration: duration.duration.value
     });
 
     res

@@ -26,12 +26,6 @@ router.post(
       .isLength({ min: 3 }),
     body("email")
       .isEmail()
-      .custom(async (email, { req }) => {
-        const cliente = await Cliente.findOne({ email });
-        if (cliente) {
-          return Promise.reject("E-mail em uso");
-        }
-      })
       .normalizeEmail(),
     body("senha")
       .trim()
@@ -49,12 +43,6 @@ router.put(
       .isEmpty(),
     body("email")
       .isEmail()
-      .custom(async (email, { req }) => {
-        const cliente = await Cliente.findOne({ email });
-        if (cliente) {
-          return Promise.reject("E-mail em uso");
-        }
-      })
       .normalizeEmail(),
     body("senha")
       .trim()

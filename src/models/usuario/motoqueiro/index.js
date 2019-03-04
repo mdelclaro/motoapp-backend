@@ -23,6 +23,10 @@ const motoqueiroSchema = new Schema(
       type: String,
       required: true
     },
+    moto: {
+      type: String,
+      required: true
+    },
     placa: {
       type: String,
       required: true

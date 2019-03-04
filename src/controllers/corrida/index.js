@@ -2,10 +2,12 @@ const { validationResult } = require("express-validator/check");
 const ObjectId = require("mongoose").Types.ObjectId;
 
 const io = require("../../utils/socket/");
+const mapsClient = require("../../utils/google-maps/");
 
 const Corrida = require("../../models/corrida/");
 const Cliente = require("../../models/usuario/cliente/");
 const Motoqueiro = require("../../models/usuario/motoqueiro/");
+const MotoqueiroLocation = require("../../models/localizacao/");
 const errorHandling = require("../../utils/error-handling/");
 
 // Buscar Corridas
@@ -111,7 +113,6 @@ exports.updateCorrida = async (req, res, next) => {
       throw error;
     }
 
-    const idCliente = req.userId;
     const idCorrida = req.params.idCorrida;
     const idMotoqueiro = req.body.idMotoqueiro || null;
     const status = req.body.status || null;
@@ -120,12 +121,16 @@ exports.updateCorrida = async (req, res, next) => {
       error = errorHandling.createError("Corrida nao encontrada", 404);
       throw error;
     }
-    if (corrida.idCliente.toString() !== req.userId) {
-      error = errorHandling.createError("Not authorized", 403);
-      throw error;
-    }
+    // TODO: Pensar em um ACL
+    // if (corrida.idCliente.toString() !== req.userId) {
+    //   error = errorHandling.createError("Not authorized", 403);
+    //   throw error;
+    // }
+
     corrida.idMotoqueiro = idMotoqueiro ? idMotoqueiro : corrida.idMotoqueiro;
     corrida.status = status ? status : corrida.status;
+
+    const idCliente = corrida.idCliente.toString();
     const result = await corrida.save();
 
     if (idMotoqueiro) {
@@ -134,9 +139,35 @@ exports.updateCorrida = async (req, res, next) => {
         error = errorHandling.createError("Id motoqueiro invalido.", 404);
         throw error;
       }
+      const location = await MotoqueiroLocation.findOne({ idMotoqueiro });
+      if (!location) {
+        error = errorHandling.createError(
+          "Localizacao do motoqueiro nao encontrada.",
+          404
+        );
+        throw error;
+      }
+      // montar objeto de origem e destino
+      // para calcular duracao do motoqueiro ate cliente
+      const origin = {
+        lat: corrida.origem.lat,
+        lng: corrida.origem.long
+      };
+      const destination = {
+        lat: location.location.lat,
+        lng: location.location.long
+      };
+      const duration = await mapsClient.getDistanceTime(origin, destination);
+      if (!duration) {
+        error = errorHandling.createError("Erro ao calcular duração", 422);
+        throw error;
+      }
       let socket = io.getIO();
-      socket.sockets.in("123").emit("acceptCorrida", { motoqueiro });
-      //TODO colocar idCliente
+      socket.sockets.in(idCliente).emit("acceptCorrida", {
+        motoqueiro,
+        coords: location.location,
+        duration: duration.duration.value
+      });
     }
 
     res.status(200).json({ message: "Corrida Atualizada", corrida: result });

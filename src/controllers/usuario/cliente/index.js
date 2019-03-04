@@ -56,9 +56,13 @@ exports.createCliente = async (req, res, next) => {
     const nome = req.body.nome;
     const sobrenome = req.body.sobrenome;
     const email = req.body.email;
-
-    // encripta senha
     const senha = await bcrypt.hash(req.body.senha, 10);
+
+    const hasCliente = await Cliente.findOne({ email });
+    if (hasCliente) {
+      error = errorHandling.createError("E-mail em uso", 422);
+      throw error;
+    }
 
     const cliente = new Cliente({
       nome,
@@ -92,6 +96,14 @@ exports.updateCliente = async (req, res, next) => {
     const idCliente = req.params.idCliente;
     const email = req.body.email;
     const senha = req.body.senha;
+
+    if (email) {
+      const hasCliente = await Cliente.findOne({ email });
+      if (hasCliente) {
+        error = errorHandling.createError("E-mail em uso", 422);
+        throw error;
+      }
+    }
 
     if (!ObjectId.isValid(idCliente)) {
       error = errorHandling.createError("ID invalido.", 422);

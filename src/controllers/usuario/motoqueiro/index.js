@@ -56,14 +56,23 @@ exports.createMotoqueiro = async (req, res, next) => {
     const sobrenome = req.body.sobrenome;
     const email = req.body.email;
     const cnh = req.body.cnh;
+    const moto = req.body.moto;
     const placa = req.body.placa;
     const senha = await bcrypt.hash(req.body.senha, 10);
+
+    const hasMotoqueiro = await Motoqueiro.findOne({ email });
+    if (hasMotoqueiro) {
+      error = errorHandling.createError("E-mail em uso", 422);
+      throw error;
+    }
+
     const motoqueiro = new Motoqueiro({
       nome,
       sobrenome,
       email,
       senha,
       cnh,
+      moto,
       placa
     });
     const result = await motoqueiro.save();
@@ -91,7 +100,16 @@ exports.updateMotoqueiro = async (req, res, next) => {
     const idMotoqueiro = req.params.idMotoqueiro;
     const email = req.body.email;
     const senha = req.body.senha;
+    const moto = req.body.moto;
     const placa = req.body.placa;
+
+    if (email) {
+      const hasMotoqueiro = await Motoqueiro.findOne({ email });
+      if (hasMotoqueiro) {
+        error = errorHandling.createError("E-mail em uso", 422);
+        throw error;
+      }
+    }
 
     if (!ObjectId.isValid(idMotoqueiro)) {
       error = errorHandling.createError("ID invalido.", 422);
@@ -104,8 +122,9 @@ exports.updateMotoqueiro = async (req, res, next) => {
       throw error;
     }
 
-    // altera email e/ou placa
+    // altera email/moto/placa
     motoqueiro.email = email ? email : motoqueiro.email;
+    motoqueiro.moto = moto ? moto : motoqueiro.moto;
     motoqueiro.placa = placa ? placa : motoqueiro.placa;
 
     // altera senha

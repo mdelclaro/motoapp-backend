@@ -3,21 +3,25 @@ const googleMapsClient = require("@google/maps").createClient({
   Promise: Promise
 });
 
-// exports.getDistanceTime = (
-//   origins = "Washington, DC, USA",
-//   destinations = "New York, NY, USA"
-// ) => {
-googleMapsClient
-  .distanceMatrix({
-    origins: "Washington, DC, USA",
-    destinations: "New York, NY, USA"
-  })
-  .asPromise()
-  .then(response => {
-    return response.json;
-  })
-  .then(parsedRes => {
-    console.log(JSON.stringify(parsedRes.rows[0].elements[0], null, 4));
-  })
-  .catch(err => console.log(err));
-// };
+module.exports = {
+  getDistanceTime: (origins, destinations) => {
+    return new Promise((resolve, reject) => {
+      googleMapsClient
+        .distanceMatrix({
+          origins,
+          destinations
+        })
+        .asPromise()
+        .then(response => {
+          return response.json;
+        })
+        .then(parsedRes => {
+          resolve(parsedRes.rows[0].elements[0]);
+        })
+        .catch(err => {
+          console.log(err);
+          reject();
+        });
+    });
+  }
+};
