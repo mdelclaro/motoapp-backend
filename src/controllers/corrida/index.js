@@ -105,30 +105,20 @@ exports.updateCorrida = async (req, res, next) => {
       error = errorHandling.createError("Validation Failed", 422);
       throw error;
     }
-    if (!req.body.status) {
-      error = errorHandling.createError(
-        "Required parameter (status) not provided",
-        422
-      );
-      throw error;
-    }
 
     const idCorrida = req.params.idCorrida;
     const idMotoqueiro = req.body.idMotoqueiro || null;
-    const status = req.body.status || null;
+    const status = req.body.status;
+    const userId = req.userId;
+
     const corrida = await Corrida.findById(idCorrida);
     if (!corrida) {
       error = errorHandling.createError("Corrida nao encontrada", 404);
       throw error;
     }
-    // TODO: Pensar em um ACL
-    // if (corrida.idCliente.toString() !== req.userId) {
-    //   error = errorHandling.createError("Not authorized", 403);
-    //   throw error;
-    // }
 
     corrida.idMotoqueiro = idMotoqueiro ? idMotoqueiro : corrida.idMotoqueiro;
-    corrida.status = status ? status : corrida.status;
+    corrida.status = status;
 
     const idCliente = corrida.idCliente.toString();
     const result = await corrida.save();
@@ -168,6 +158,26 @@ exports.updateCorrida = async (req, res, next) => {
         coords: location.location,
         duration: duration.duration.value
       });
+    }
+
+    // motoqueiro chegou, iniciar viagem
+    if (status == 2) {
+      if (userId !== corrida.idMotoqueiro.toString()) {
+        error = errorHandling.createError("ACL Error", 401);
+        throw error;
+      }
+      let socket = io.getIO();
+      socket.sockets.in(userId).emit("startCorrida");
+    }
+
+    // fim da corrida
+    if (status == 3) {
+      if (userId !== corrida.idMotoqueiro.toString()) {
+        error = errorHandling.createError("ACL Error", 401);
+        throw error;
+      }
+      let socket = io.getIO();
+      socket.sockets.in(userId).emit("finishCorrida");
     }
 
     res.status(200).json({ message: "Corrida Atualizada", corrida: result });

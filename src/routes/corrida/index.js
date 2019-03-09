@@ -49,6 +49,8 @@ router.put(
     body("status")
       .trim()
       .escape()
+      .not()
+      .isEmpty()
   ],
   auth,
   corridaController.updateCorrida

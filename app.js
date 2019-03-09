@@ -55,6 +55,7 @@ mongoose
       socket.on("join", data => {
         console.log("join " + data.id);
         socket.join(data.id);
+        //clients.push({ id: data.id, socket });
       });
       console.log("Connected");
     });

@@ -7,8 +7,9 @@ const corridaSchema = new Schema(
      *  --- Status ---
      * 0 - Corrida Solicitada
      * 1 - Corrida Aceita
-     * 2 - Corrida Finalizada
-     * 3 - Corrida Cancelada
+     * 2 - Corrida em Andamento
+     * 3 - Corrida Finalizada
+     * 4 - Corrida Cancelada
      * ---------------
      */
     origem: {
@@ -33,7 +34,8 @@ const corridaSchema = new Schema(
       required: true
     },
     idMotoqueiro: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref: "Motoqueiro",
       required: false
     },
     status: {
