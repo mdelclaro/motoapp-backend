@@ -30,7 +30,13 @@ const motoqueiroSchema = new Schema(
     placa: {
       type: String,
       required: true
-    }
+    },
+    avaliacoes: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Avaliacao"
+      }
+    ]
   },
   { timestamps: true }
 );

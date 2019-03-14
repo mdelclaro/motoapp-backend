@@ -11,6 +11,7 @@ const corridaRoutes = require("./src/routes/corrida/");
 const clienteRoutes = require("./src/routes/usuario/cliente/");
 const motoqueiroRoutes = require("./src/routes/usuario/motoqueiro/");
 const motoqueiroLocationRoutes = require("./src/routes/location/");
+const avaliacaoRoutes = require("./src/routes/avaliacao/");
 const authRoute = require("./src/routes/auth/");
 
 const app = express();
@@ -27,6 +28,7 @@ app.use("/motoapp/v1/corrida", corridaRoutes);
 app.use("/motoapp/v1/usuario/cliente", clienteRoutes);
 app.use("/motoapp/v1/usuario/motoqueiro", motoqueiroRoutes);
 app.use("/motoapp/v1/localizacao", motoqueiroLocationRoutes);
+app.use("/motoapp/v1/avaliacao", avaliacaoRoutes);
 app.use("/motoapp/v1/auth", authRoute);
 
 // tratamento de erros
