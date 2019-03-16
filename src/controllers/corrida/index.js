@@ -129,6 +129,11 @@ exports.updateCorrida = async (req, res, next) => {
         error = errorHandling.createError("Id motoqueiro invalido.", 404);
         throw error;
       }
+
+      // salva a corrida no motoqueiro
+      motoqueiro.corridas.push(corrida);
+      await motoqueiro.save();
+
       const location = await MotoqueiroLocation.findOne({ idMotoqueiro });
       if (!location) {
         error = errorHandling.createError(

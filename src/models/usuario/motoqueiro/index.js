@@ -31,6 +31,12 @@ const motoqueiroSchema = new Schema(
       type: String,
       required: true
     },
+    corridas: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Corrida"
+      }
+    ],
     avaliacoes: [
       {
         type: Schema.Types.ObjectId,

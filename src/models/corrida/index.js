@@ -39,7 +39,7 @@ const corridaSchema = new Schema(
       required: false
     },
     status: {
-      type: String,
+      type: Number,
       required: true
     }
   },
