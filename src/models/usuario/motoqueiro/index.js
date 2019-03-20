@@ -21,15 +21,15 @@ const motoqueiroSchema = new Schema(
     },
     cnh: {
       type: String,
-      required: true
+      required: false
     },
     moto: {
       type: String,
-      required: true
+      required: false
     },
     placa: {
       type: String,
-      required: true
+      required: false
     },
     corridas: [
       {
