@@ -57,18 +57,16 @@ mongoose
     io.sockets.on("connection", socket => {
       //clients
       socket.on("join", data => {
-        console.log("Client joined: " + data.id);
+        // console.log("Client joined: " + data.id);
         socket.join(data.id);
       });
       //drivers
       io.of("/drivers").on("connection", socket => {
         socket.on("join", data => {
-          console.log("Driver joined: " + data.id);
-          socket.userId = data.id;
+          // console.log("Driver joined: " + data.id);
+          socket.userId = data.id.toString();
         });
-        console.log("teste");
       });
-      console.log("User connected!");
     });
   })
   .catch(err => console.log("erro mongo: " + err));

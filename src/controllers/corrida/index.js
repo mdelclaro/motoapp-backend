@@ -1,5 +1,7 @@
 const { validationResult } = require("express-validator/check");
 const ObjectId = require("mongoose").Types.ObjectId;
+const geolib = require("geolib");
+const quickSort = require("@charlesstover/quicksort").default;
 
 const io = require("../../utils/socket/");
 const mapsClient = require("../../utils/google-maps/");
@@ -54,7 +56,6 @@ exports.getCorrida = async (req, res, next) => {
 exports.createCorrida = async (req, res, next) => {
   try {
     const errors = validationResult(req);
-    //console.log(req.body);
     if (!errors.isEmpty()) {
       error = errorHandling.createError(
         "Validation Failed (createCorrida)",
@@ -79,14 +80,9 @@ exports.createCorrida = async (req, res, next) => {
       status
     });
     await corrida.save();
-    const cliente = await Cliente.findById(req.userId);
+    const cliente = await Cliente.findById(idCliente);
     cliente.corridas.push(corrida);
     await cliente.save();
-
-    const drivers = io.of("/drivers").connected;
-    drivers.forEach(driver => {
-      console.log(driver.userId);
-    });
 
     //io.getIO().emit("corrida", { action: "create", corrida });
     res.status(201).json({
@@ -233,5 +229,80 @@ exports.deleteCorrida = async (req, res, next) => {
     }
   } catch (err) {
     next(err);
+  }
+};
+
+exports.handleDispatch = async (req, res, next) => {
+  const idCorrida = req.body.idCorrida;
+
+  if (!ObjectId.isValid(idCorrida)) {
+    error = errorHandling.createError("ID invalido", 422);
+    throw error;
+  }
+  const corrida = await Corrida.findById(idCorrida);
+  if (!corrida) {
+    error = errorHandling.createError("Nenhuma corrida encontrada.", 404);
+    throw error;
+  }
+  const originCoordinates = {
+    latitude: parseFloat(corrida.origem.lat),
+    longitude: parseFloat(corrida.origem.long)
+  };
+
+  //motoqueiros conectados
+  let socket = io.getIO();
+  const drivers = socket.of("/drivers").connected;
+
+  console.log(socket.engine.clientsCount);
+  if (socket.engine.clientsCount > 0) {
+    let distances = [];
+
+    //popular as distancias
+    for (let key in drivers) {
+      const idMotoqueiro = drivers[key].userId;
+      const location = await MotoqueiroLocation.findOne({
+        idMotoqueiro
+      });
+      if (!location) {
+        error = errorHandling.createError(
+          "Localizacao do motoqueiro nao encontrada.",
+          404
+        );
+        //throw error;
+      } else {
+        const driverCoordinates = {
+          latitude: parseFloat(location.location.lat),
+          longitude: parseFloat(location.location.long)
+        };
+        const distance = geolib.getDistance(
+          driverCoordinates,
+          originCoordinates,
+          1
+        );
+        console.log(distance);
+        distances.push({ userId: idMotoqueiro, distance });
+      }
+    }
+    //comparador para o quickSort
+    const comparator = (a, b) => {
+      if (a.distance < b.distance) {
+        return -1;
+      }
+      if (a.distance > b.distance) {
+        return 1;
+      }
+      return 0;
+    };
+
+    distances[0].distance = 13000;
+    distances[1].distance = 14000;
+
+    //array de drivers ordenado por distancia do request
+    const sorted = quickSort(distances, comparator);
+
+    //mandar para os drivers em order de distancia
+    for (let key in sorted) {
+      console.log(sorted[key].distance);
+    }
   }
 };
