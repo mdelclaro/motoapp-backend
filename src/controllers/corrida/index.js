@@ -304,5 +304,9 @@ exports.handleDispatch = async (req, res, next) => {
     for (let key in sorted) {
       console.log(sorted[key].distance);
     }
+  } else {
+    res.status(422).json({
+      message: "Nenhum motoqueiro disponível :("
+    });
   }
 };
