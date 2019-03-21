@@ -90,6 +90,7 @@ exports.createCorrida = async (req, res, next) => {
       corrida,
       cliente: { _id: cliente._id, nome: cliente.nome }
     });
+    module.exports.handleDispatch(corrida);
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
@@ -232,18 +233,7 @@ exports.deleteCorrida = async (req, res, next) => {
   }
 };
 
-exports.handleDispatch = async (req, res, next) => {
-  const idCorrida = req.body.idCorrida;
-
-  if (!ObjectId.isValid(idCorrida)) {
-    error = errorHandling.createError("ID invalido", 422);
-    throw error;
-  }
-  const corrida = await Corrida.findById(idCorrida);
-  if (!corrida) {
-    error = errorHandling.createError("Nenhuma corrida encontrada.", 404);
-    throw error;
-  }
+exports.handleDispatch = async corrida => {
   const originCoordinates = {
     latitude: parseFloat(corrida.origem.lat),
     longitude: parseFloat(corrida.origem.long)
@@ -253,7 +243,6 @@ exports.handleDispatch = async (req, res, next) => {
   let socket = io.getIO();
   const drivers = socket.of("/drivers").connected;
 
-  console.log(socket.engine.clientsCount);
   if (socket.engine.clientsCount > 0) {
     let distances = [];
 
@@ -279,7 +268,6 @@ exports.handleDispatch = async (req, res, next) => {
           originCoordinates,
           1
         );
-        console.log(distance);
         distances.push({ userId: idMotoqueiro, distance });
       }
     }
@@ -294,6 +282,7 @@ exports.handleDispatch = async (req, res, next) => {
       return 0;
     };
 
+    //testing purposes
     distances[0].distance = 13000;
     distances[1].distance = 14000;
 
@@ -301,23 +290,39 @@ exports.handleDispatch = async (req, res, next) => {
     const sorted = quickSort(distances, comparator);
 
     //mandar para os drivers em order de distancia
+    let accepted = false;
     for (let key in sorted) {
-      // console.log(sorted[key].distance);
-      socket.emit(
-        "dispatch",
-        { corrida, distance: sorted[key].distance },
-        reply => {
-          if (!reply) {
-            continue;
-          } else {
-            
-          }
+      try {
+        const reply = await module.exports.handleSocket(
+          sorted[key].userId,
+          corrida,
+          sorted[key].distance
+        );
+        if (reply) {
+          accepted = true;
+          break;
         }
-      );
+      } catch (e) {
+        continue;
+      }
+    }
+    if (!accepted) {
+      socket.sockets.in(corrida.idCliente).emit("cancelCorrida");
+      return;
     }
   } else {
-    res.status(422).json({
-      message: "Nenhum motoqueiro disponível :("
-    });
+    socket.sockets.in(corrida.idCliente).emit("cancelCorrida");
   }
+};
+
+exports.handleSocket = (userId, corrida, distance) => {
+  return new Promise((resolve, reject) => {
+    socket.sockets.in(userId).emit("dispatch", { corrida, distance }, reply => {
+      if (reply) {
+        resolve(true);
+      } else {
+        reject();
+      }
+    });
+  });
 };
