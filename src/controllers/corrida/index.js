@@ -83,6 +83,11 @@ exports.createCorrida = async (req, res, next) => {
     cliente.corridas.push(corrida);
     await cliente.save();
 
+    const drivers = io.of("/drivers").connected;
+    drivers.forEach(driver => {
+      console.log(driver.userId);
+    });
+
     //io.getIO().emit("corrida", { action: "create", corrida });
     res.status(201).json({
       message: "Corrida criada com sucesso!",
@@ -172,7 +177,7 @@ exports.updateCorrida = async (req, res, next) => {
         throw error;
       }
       let socket = io.getIO();
-      socket.sockets.in(userId).emit("startCorrida");
+      socket.sockets.in(idCliente).emit("startCorrida");
     }
 
     // fim da corrida
@@ -182,7 +187,7 @@ exports.updateCorrida = async (req, res, next) => {
         throw error;
       }
       let socket = io.getIO();
-      socket.sockets.in(userId).emit("finishCorrida");
+      socket.sockets.in(idCliente).emit("finishCorrida");
     }
 
     res.status(200).json({ message: "Corrida Atualizada", corrida: result });

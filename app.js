@@ -43,23 +43,32 @@ app.use((req, res) => {
   res.status(404).json({ message: "Invalid URL" });
 });
 
-// mongoDB
+// mongoDB && init server
 mongoose
   .connect(
     `mongodb+srv://mdelclaro:${mongoPwd}@cluster0-jjfdi.mongodb.net/motoapp?retryWrites=true`,
     { useNewUrlParser: true }
   )
-  .then(result => {
+  .then(() => {
     const server = app.listen(8080);
-    let clients = [];
     const io = require("./src/utils/socket/").init(server);
+
+    //all users
     io.sockets.on("connection", socket => {
+      //clients
       socket.on("join", data => {
-        console.log("join " + data.id);
+        console.log("Client joined: " + data.id);
         socket.join(data.id);
-        //clients.push({ id: data.id, socket });
       });
-      console.log("Connected");
+      //drivers
+      io.of("/drivers").on("connection", socket => {
+        socket.on("join", data => {
+          console.log("Driver joined: " + data.id);
+          socket.userId = data.id;
+        });
+        console.log("teste");
+      });
+      console.log("User connected!");
     });
   })
   .catch(err => console.log("erro mongo: " + err));
