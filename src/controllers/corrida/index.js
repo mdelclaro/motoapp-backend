@@ -302,7 +302,18 @@ exports.handleDispatch = async (req, res, next) => {
 
     //mandar para os drivers em order de distancia
     for (let key in sorted) {
-      console.log(sorted[key].distance);
+      // console.log(sorted[key].distance);
+      socket.emit(
+        "dispatch",
+        { corrida, distance: sorted[key].distance },
+        reply => {
+          if (!reply) {
+            continue;
+          } else {
+            
+          }
+        }
+      );
     }
   } else {
     res.status(422).json({
