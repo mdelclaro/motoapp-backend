@@ -68,7 +68,8 @@ exports.createCorrida = async (req, res, next) => {
     const destino = req.body.destino;
     const distancia = req.body.distancia;
     const tempo = req.body.tempo;
-    const idCliente = req.userId;
+    // const idCliente = req.userId;
+    const idCliente = req.body.idCliente;
     const status = 0;
 
     const corrida = new Corrida({
@@ -79,10 +80,10 @@ exports.createCorrida = async (req, res, next) => {
       idCliente,
       status
     });
-    await corrida.save();
+    // await corrida.save();
     const cliente = await Cliente.findById(idCliente);
-    cliente.corridas.push(corrida);
-    await cliente.save();
+    // cliente.corridas.push(corrida);
+    // await cliente.save();
 
     //io.getIO().emit("corrida", { action: "create", corrida });
     res.status(201).json({
@@ -234,93 +235,103 @@ exports.deleteCorrida = async (req, res, next) => {
 };
 
 exports.handleDispatch = async corrida => {
-  const originCoordinates = {
-    latitude: parseFloat(corrida.origem.lat),
-    longitude: parseFloat(corrida.origem.long)
-  };
-
-  //motoqueiros conectados
-  let socket = io.getIO();
-  const drivers = socket.of("/drivers").connected;
-
-  if (socket.engine.clientsCount > 0) {
-    let distances = [];
-
-    //popular as distancias
-    for (let key in drivers) {
-      const idMotoqueiro = drivers[key].userId;
-      const location = await MotoqueiroLocation.findOne({
-        idMotoqueiro
-      });
-      if (!location) {
-        error = errorHandling.createError(
-          "Localizacao do motoqueiro nao encontrada.",
-          404
-        );
-        //throw error;
-      } else {
-        const driverCoordinates = {
-          latitude: parseFloat(location.location.lat),
-          longitude: parseFloat(location.location.long)
-        };
-        const distance = geolib.getDistance(
-          driverCoordinates,
-          originCoordinates,
-          1
-        );
-        distances.push({ userId: idMotoqueiro, distance });
-      }
-    }
-    //comparador para o quickSort
-    const comparator = (a, b) => {
-      if (a.distance < b.distance) {
-        return -1;
-      }
-      if (a.distance > b.distance) {
-        return 1;
-      }
-      return 0;
+  try {
+    const originCoordinates = {
+      latitude: parseFloat(corrida.origem.lat),
+      longitude: parseFloat(corrida.origem.long)
     };
 
-    //testing purposes
-    distances[0].distance = 13000;
-    distances[1].distance = 14000;
+    //motoqueiros conectados
+    let socket = io.getIO();
+    const drivers = socket.of("/drivers").connected;
 
-    //array de drivers ordenado por distancia do request
-    const sorted = quickSort(distances, comparator);
+    if (socket.engine.clientsCount > 0) {
+      let distances = [];
 
-    //mandar para os drivers em order de distancia
-    let accepted = false;
-    for (let key in sorted) {
-      try {
-        const reply = await module.exports.handleSocket(
-          sorted[key].userId,
-          corrida,
-          sorted[key].distance
-        );
-        if (reply) {
-          accepted = true;
-          break;
+      //popular as distancias
+      for (let key in drivers) {
+        const socket = drivers[key];
+        const idMotoqueiro = drivers[key].userId;
+        const location = await MotoqueiroLocation.findOne({
+          idMotoqueiro
+        });
+        if (!location) {
+          error = errorHandling.createError(
+            "Localizacao do motoqueiro nao encontrada.",
+            404
+          );
+          //throw error;
+        } else {
+          const driverCoordinates = {
+            latitude: parseFloat(location.location.lat),
+            longitude: parseFloat(location.location.long)
+          };
+          const distance = geolib.getDistance(
+            driverCoordinates,
+            originCoordinates,
+            1
+          );
+          distances.push({ userId: idMotoqueiro, distance, socket });
         }
-      } catch (e) {
-        continue;
       }
-    }
-    if (!accepted) {
+      //comparador para o quickSort
+      const comparator = (a, b) => {
+        if (a.distance < b.distance) {
+          return -1;
+        }
+        if (a.distance > b.distance) {
+          return 1;
+        }
+        return 0;
+      };
+
+      //testing purposes
+      // distances[0].distance = 13000;
+      distances[1].distance = 14000;
+
+      //array de drivers ordenado por distancia do request
+      const sorted = quickSort(distances, comparator);
+
+      //mandar para os drivers em order de distancia
+      let accepted = false;
+      for (let key in sorted) {
+        try {
+          const reply = await module.exports.handleSocket(
+            sorted[key].socket,
+            sorted[key].userId,
+            corrida,
+            sorted[key].distance
+          );
+          if (reply) {
+            accepted = true;
+            break;
+          }
+        } catch (e) {
+          console.log(e);
+          continue;
+        }
+      }
+      if (!accepted) {
+        socket.sockets.in(corrida.idCliente).emit("cancelCorrida");
+        return;
+      }
+    } else {
+      console.log("ngm disponivel");
       socket.sockets.in(corrida.idCliente).emit("cancelCorrida");
-      return;
     }
-  } else {
-    socket.sockets.in(corrida.idCliente).emit("cancelCorrida");
+  } catch (err) {
+    console.log(err);
   }
 };
 
-exports.handleSocket = (userId, corrida, distance) => {
+exports.handleSocket = (socket, userId, corrida, distance) => {
+  // console.log(socket ? "socket" : "n");
   return new Promise((resolve, reject) => {
-    socket.sockets.in(userId).emit("dispatch", { corrida, distance }, reply => {
-      if (reply) {
+    socket.emit("dispatch", { corrida, distance }, reply => {
+      console.log(reply);
+      if (reply === "accept") {
         resolve(true);
-      } else {
+      } else if (reply === "reject") {
         reject();
       }
     });

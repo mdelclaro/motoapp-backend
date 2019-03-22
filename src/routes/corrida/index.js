@@ -32,7 +32,7 @@ router.post(
       .not()
       .isEmpty()
   ],
-  auth,
+  // auth,
   corridaController.createCorrida
 );
 
