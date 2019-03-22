@@ -287,7 +287,7 @@ exports.handleDispatch = async corrida => {
 
       //testing purposes
       // distances[0].distance = 13000;
-      distances[1].distance = 14000;
+      // distances[1].distance = 14000;
 
       //array de drivers ordenado por distancia do request
       const sorted = quickSort(distances, comparator);
@@ -298,7 +298,6 @@ exports.handleDispatch = async corrida => {
         try {
           const reply = await module.exports.handleSocket(
             sorted[key].socket,
-            sorted[key].userId,
             corrida,
             sorted[key].distance
           );
@@ -324,7 +323,7 @@ exports.handleDispatch = async corrida => {
   }
 };
 
-exports.handleSocket = (socket, userId, corrida, distance) => {
+exports.handleSocket = (socket, corrida, distance) => {
   // console.log(socket ? "socket" : "n");
   return new Promise((resolve, reject) => {
     socket.emit("dispatch", { corrida, distance }, reply => {
