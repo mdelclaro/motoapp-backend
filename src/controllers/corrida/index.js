@@ -68,8 +68,8 @@ exports.createCorrida = async (req, res, next) => {
     const destino = req.body.destino;
     const distancia = req.body.distancia;
     const tempo = req.body.tempo;
-    // const idCliente = req.userId;
-    const idCliente = req.body.idCliente;
+    const idCliente = req.userId;
+    // const idCliente = req.body.idCliente;
     const status = 0;
 
     const corrida = new Corrida({
@@ -80,10 +80,10 @@ exports.createCorrida = async (req, res, next) => {
       idCliente,
       status
     });
-    // await corrida.save();
+    await corrida.save();
     const cliente = await Cliente.findById(idCliente);
-    // cliente.corridas.push(corrida);
-    // await cliente.save();
+    cliente.corridas.push(corrida);
+    await cliente.save();
 
     //io.getIO().emit("corrida", { action: "create", corrida });
     res.status(201).json({
