@@ -91,7 +91,7 @@ exports.createCorrida = async (req, res, next) => {
       corrida,
       cliente: { _id: cliente._id, nome: cliente.nome }
     });
-    module.exports.handleDispatch(corrida);
+    module.exports.handleDispatch(corrida, cliente);
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
@@ -234,7 +234,7 @@ exports.deleteCorrida = async (req, res, next) => {
   }
 };
 
-exports.handleDispatch = async corrida => {
+exports.handleDispatch = async (corrida, cliente) => {
   try {
     const originCoordinates = {
       latitude: parseFloat(corrida.origem.lat),
@@ -299,7 +299,8 @@ exports.handleDispatch = async corrida => {
           const reply = await module.exports.handleSocket(
             sorted[key].socket,
             corrida,
-            sorted[key].distance
+            sorted[key].distance,
+            cliente
           );
           if (reply) {
             accepted = true;
@@ -323,10 +324,10 @@ exports.handleDispatch = async corrida => {
   }
 };
 
-exports.handleSocket = (socket, corrida, distance) => {
+exports.handleSocket = (socket, corrida, distance, cliente) => {
   // console.log(socket ? "socket" : "n");
   return new Promise((resolve, reject) => {
-    socket.emit("dispatch", { corrida, distance }, reply => {
+    socket.emit("dispatch", { corrida, distance, cliente }, reply => {
       console.log(reply);
       if (reply === "accept") {
         resolve(true);

@@ -53,21 +53,23 @@ mongoose
     const server = app.listen(8080);
     const io = require("./src/utils/socket/").init(server);
 
-    //all users
+    //clientes
     io.sockets.on("connection", socket => {
-      //clients
       socket.on("join", data => {
-        // console.log("Client joined: " + data.id);
         socket.join(data.id);
       });
-      //drivers
-      io.of("/drivers").on("connection", socket => {
-        socket.on("join", data => {
-          // console.log(socket.id);
-          // console.log("Driver joined: " + data.id);
-          socket.userId = data.id.toString();
-          socket.join(socket.userId);
-        });
+      socket.on("disconnect", () => {
+        socket.removeAllListeners();
+      });
+    });
+    //drivers
+    io.of("/drivers").on("connection", socket => {
+      socket.on("join", data => {
+        socket.userId = data.id.toString();
+        socket.join(socket.userId);
+      });
+      socket.on("disconnect", () => {
+        socket.removeAllListeners();
       });
     });
   })
