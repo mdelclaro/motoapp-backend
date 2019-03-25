@@ -35,7 +35,7 @@ exports.getCorrida = async (req, res, next) => {
     const idCorrida = req.params.idCorrida;
 
     if (!ObjectId.isValid(idCorrida)) {
-      error = errorHandling.createError("ID invalido", 422);
+      error = errorHandling.createError("ID inválido", 422);
       throw error;
     }
     const corrida = await Corrida.findById(idCorrida);
@@ -69,7 +69,6 @@ exports.createCorrida = async (req, res, next) => {
     const distancia = req.body.distancia;
     const tempo = req.body.tempo;
     const idCliente = req.userId;
-    // const idCliente = req.body.idCliente;
     const status = 0;
 
     const corrida = new Corrida({
@@ -116,7 +115,7 @@ exports.updateCorrida = async (req, res, next) => {
 
     const corrida = await Corrida.findById(idCorrida);
     if (!corrida) {
-      error = errorHandling.createError("Corrida nao encontrada", 404);
+      error = errorHandling.createError("Corrida não encontrada", 404);
       throw error;
     }
 
@@ -129,7 +128,7 @@ exports.updateCorrida = async (req, res, next) => {
     if (idMotoqueiro) {
       const motoqueiro = await Motoqueiro.findById(idMotoqueiro);
       if (!motoqueiro) {
-        error = errorHandling.createError("Id motoqueiro invalido.", 404);
+        error = errorHandling.createError("Id motoqueiro inválido.", 404);
         throw error;
       }
 
@@ -140,7 +139,7 @@ exports.updateCorrida = async (req, res, next) => {
       const location = await MotoqueiroLocation.findOne({ idMotoqueiro });
       if (!location) {
         error = errorHandling.createError(
-          "Localizacao do motoqueiro nao encontrada.",
+          "Localização do motoqueiro não encontrada.",
           404
         );
         throw error;
@@ -171,7 +170,7 @@ exports.updateCorrida = async (req, res, next) => {
     // motoqueiro chegou, iniciar viagem
     if (status == 2) {
       if (userId !== corrida.idMotoqueiro.toString()) {
-        error = errorHandling.createError("ACL Error", 401);
+        error = errorHandling.createError("ACL error", 401);
         throw error;
       }
       let socket = io.getIO();
@@ -181,14 +180,14 @@ exports.updateCorrida = async (req, res, next) => {
     // fim da corrida
     if (status == 3) {
       if (userId !== corrida.idMotoqueiro.toString()) {
-        error = errorHandling.createError("ACL Error", 401);
+        error = errorHandling.createError("ACL error", 401);
         throw error;
       }
       let socket = io.getIO();
       socket.sockets.in(idCliente).emit("finishCorrida");
     }
 
-    res.status(200).json({ message: "Corrida Atualizada", corrida: result });
+    res.status(200).json({ message: "Corrida atualizada", corrida: result });
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
@@ -207,7 +206,7 @@ exports.deleteCorrida = async (req, res, next) => {
     }
     const idCorrida = req.params.idCorrida;
     if (!ObjectId.isValid(idCorrida)) {
-      error = errorHandling.createError("ID invalido.", 422);
+      error = errorHandling.createError("ID inválido.", 422);
       throw error;
     }
     const corrida = await Corrida.findById(idCorrida);
@@ -216,7 +215,7 @@ exports.deleteCorrida = async (req, res, next) => {
       throw error;
     }
     if (corrida.idCliente.toString() !== req.userId) {
-      error = errorHandling.createError("Not authorized", 403);
+      error = errorHandling.createError("Não autorizado", 403);
       throw error;
     }
     if (!corrida.idMotoqueiro) {
@@ -224,7 +223,7 @@ exports.deleteCorrida = async (req, res, next) => {
       const cliente = await Cliente.findById(req.userId);
       cliente.corridas.pull(idCorrida);
       await cliente.save();
-      res.status(200).json({ message: "Deleted" });
+      res.status(200).json({ message: "Deletado" });
     } else {
       error = errorHandling.createError("Esta corrida já foi aceita!", 422);
       throw error;
@@ -257,7 +256,7 @@ exports.handleDispatch = async (corrida, cliente) => {
         });
         if (!location) {
           error = errorHandling.createError(
-            "Localizacao do motoqueiro nao encontrada.",
+            "Localização do motoqueiro não encontrada.",
             404
           );
           //throw error;
@@ -316,7 +315,6 @@ exports.handleDispatch = async (corrida, cliente) => {
         return;
       }
     } else {
-      console.log("ngm disponivel");
       socket.sockets.in(corrida.idCliente).emit("cancelCorrida");
     }
   } catch (err) {

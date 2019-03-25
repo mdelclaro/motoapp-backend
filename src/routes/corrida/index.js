@@ -45,7 +45,9 @@ router.put(
       .isEmpty(),
     body("idMotoqueiro")
       .trim()
-      .escape(),
+      .escape()
+      .not()
+      .isEmpty(),
     body("status")
       .trim()
       .escape()

@@ -24,7 +24,11 @@ const clienteSchema = new Schema(
         type: Schema.Types.ObjectId,
         ref: "Corrida"
       }
-    ]
+    ],
+    imgPerfil: {
+      type: String,
+      require: false
+    }
   },
   { timestamps: true }
 );

@@ -17,12 +17,12 @@ exports.login = async (req, res, next) => {
 
     const motoqueiro = await Motoqueiro.findOne({ email });
     if (!motoqueiro) {
-      const error = errorHandling.createError("E-mail nao cadastrado", 401);
+      const error = errorHandling.createError("E-mail não cadastrado", 401);
       throw error;
     }
     const isEqual = await bcrypt.compare(senha, motoqueiro.senha);
     if (!isEqual) {
-      const error = errorHandling.createError("Senha invalida", 401);
+      const error = errorHandling.createError("Senha inválida", 401);
       throw error;
     }
     const token = jwt.sign(
@@ -66,14 +66,14 @@ exports.refreshToken = async (req, res, next) => {
     try {
       decodedToken = jwt.verify(refreshToken, refreshTokenPublicKey);
     } catch (err) {
-      err.message = "Invalid Token";
+      err.message = "Token inválido";
       err.statusCode = 500;
       throw err;
     }
     const email = decodedToken.email;
     const motoqueiro = await Motoqueiro.findOne({ email });
     if (!motoqueiro) {
-      const error = errorHandling.createError("E-mail nao cadastrado", 401);
+      const error = errorHandling.createError("E-mail não cadastrado", 401);
       throw error;
     }
 

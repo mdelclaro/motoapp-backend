@@ -29,19 +29,7 @@ router.post(
       .normalizeEmail(),
     body("senha")
       .trim()
-      .isLength({ min: 4 }),
-    body("cnh")
-      .trim()
-      .not()
-      .isEmpty(),
-    body("moto")
-      .trim()
-      .not()
-      .isEmpty(),
-    body("placa")
-      .trim()
-      .not()
-      .isEmpty()
+      .isLength({ min: 6 })
   ],
   motoqueiroController.createMotoqueiro
 );
@@ -55,18 +43,20 @@ router.put(
       .isEmpty(),
     body("email")
       .isEmail()
-      .normalizeEmail(),
+      .normalizeEmail()
+      .optional(),
     body("senha")
       .trim()
-      .isLength({ min: 4 }),
+      .isLength({ min: 6 })
+      .optional(),
     body("moto")
       .trim()
-      .not()
-      .isEmpty(),
+      .isLength({ max: 20 })
+      .optional(),
     body("placa")
       .trim()
-      .not()
-      .isEmpty()
+      .isLength({ min: 7, max: 7 })
+      .optional()
   ],
   auth,
   motoqueiroController.updateMotoqueiro

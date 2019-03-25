@@ -29,7 +29,7 @@ router.post(
       .normalizeEmail(),
     body("senha")
       .trim()
-      .isLength({ min: 4 })
+      .isLength({ min: 6 })
   ],
   clienteController.createCliente
 );
@@ -43,10 +43,12 @@ router.put(
       .isEmpty(),
     body("email")
       .isEmail()
-      .normalizeEmail(),
+      .normalizeEmail()
+      .optional(),
     body("senha")
       .trim()
-      .isLength({ min: 4 })
+      .isLength({ min: 6 })
+      .optional()
   ],
   auth,
   clienteController.updateCliente
