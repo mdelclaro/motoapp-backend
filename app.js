@@ -63,7 +63,7 @@ mongoose
       //drivers
       io.of("/drivers").on("connection", socket => {
         socket.on("join", data => {
-          console.log(socket.id);
+          // console.log(socket.id);
           // console.log("Driver joined: " + data.id);
           socket.userId = data.id.toString();
           socket.join(socket.userId);
