@@ -2,6 +2,9 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const bodyParser = require("body-parser");
+const multer = require("multer");
+const path = require("path");
+const uuidv4 = require("uuid/v4");
 require("dotenv").config();
 
 const { mongoPwd } = require("./src/config");
@@ -16,12 +19,43 @@ const authRoute = require("./src/routes/auth/");
 
 const app = express();
 
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "images");
+  },
+  filename: (req, file, cb) => {
+    cb(null, uuidv4() + ".png");
+  }
+});
+
+const fileFilter = (req, file, cb) => {
+  if (
+    file.mimetype === "image/png" ||
+    file.mimetype === "image/jpg" ||
+    file.mimetype === "image/jpeg"
+  ) {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
+
 // Add cors headers
 app.use(cors());
 
 // bodyParser dos requests
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+// image upload
+app.use(
+  multer({ storage, fileFilter }).fields([
+    { name: "imgPerfil" },
+    { name: "cnh1" },
+    { name: "cnh2" }
+  ])
+);
+app.use("/images", express.static(path.join(__dirname, "images")));
 
 // Rotas
 app.use("/motoapp/v1/corrida", corridaRoutes);
@@ -40,7 +74,7 @@ app.use((error, req, res, next) => {
 });
 
 app.use((req, res) => {
-  res.status(404).json({ message: "Invalid URL" });
+  res.status(404).json({ message: "URL inválida" });
 });
 
 // mongoDB && init server
@@ -73,4 +107,4 @@ mongoose
       });
     });
   })
-  .catch(err => console.log("erro mongo: " + err));
+  .catch(err => console.log("Erro mongoDB: " + err));

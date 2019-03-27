@@ -13,7 +13,7 @@ exports.getAvaliacoes = async (req, res, next) => {
   try {
     const avaliacoes = await Avalicao.find();
     if (!avaliacoes) {
-      error = errorHandling.createError("Nenhuma avaliacao encontrada.", 404);
+      error = errorHandling.createError("Nenhuma avaliação encontrada.", 404);
       throw error;
     }
     res.status(200).json({ message: "Sucesso", avaliacoes });
@@ -31,12 +31,12 @@ exports.getAvaliacao = async (req, res, next) => {
     const idAvaliacao = req.params.idAvaliacao;
 
     if (!ObjectId.isValid(idAvaliacao)) {
-      error = errorHandling.createError("ID invalido", 422);
+      error = errorHandling.createError("ID inválido", 422);
       throw error;
     }
     const avaliacao = await Avalicao.findById(idAvaliacao);
     if (!avaliacao) {
-      error = errorHandling.createError("Nenhuma avaliacao encontrada.", 404);
+      error = errorHandling.createError("Nenhuma avaliação encontrada.", 404);
       throw error;
     }
     res.status(200).json({ message: "Sucesso", avaliacao });
@@ -60,13 +60,10 @@ exports.createAvaliacao = async (req, res, next) => {
       throw error;
     }
 
-    console.log(req.body);
     const nota = req.body.nota;
     const comentario = req.body.comentario;
     const idMotoqueiro = req.body.idMotoqueiro;
     const idCliente = req.userId;
-
-    console.log(idMotoqueiro);
 
     const motoqueiro = await Motoqueiro.findById(idMotoqueiro);
     if (!motoqueiro) {
@@ -89,7 +86,7 @@ exports.createAvaliacao = async (req, res, next) => {
     await motoqueiro.save();
 
     res.status(201).json({
-      message: "Avaliacao criada com sucesso!",
+      message: "Avaliação criada com sucesso!",
       avaliacao
     });
   } catch (err) {

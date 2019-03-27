@@ -96,6 +96,7 @@ exports.updateCliente = async (req, res, next) => {
     const idCliente = req.params.idCliente;
     const email = req.body.email;
     const senha = req.body.senha;
+    const imgPerfil = req.files.imgPerfil[0].path;
 
     if (email) {
       const hasCliente = await Cliente.findOne({ email });
@@ -106,17 +107,19 @@ exports.updateCliente = async (req, res, next) => {
     }
 
     if (!ObjectId.isValid(idCliente)) {
-      error = errorHandling.createError("ID invalido.", 422);
+      error = errorHandling.createError("ID inválido.", 422);
       throw error;
     }
 
     const cliente = await Cliente.findById(idCliente);
     if (!cliente) {
-      error = errorHandling.createError("Cliente nao encontrado.", 404);
+      error = errorHandling.createError("Cliente não encontrado.", 404);
       throw error;
     }
     // altera email
     cliente.email = email ? email : cliente.email;
+    // altera img perfil
+    cliente.imgPerfil = imgPerfil ? imgPerfil : cliente.imgPerfil;
 
     // altera senha
     if (senha) {
@@ -124,7 +127,7 @@ exports.updateCliente = async (req, res, next) => {
     }
 
     const result = await cliente.save();
-    res.status(200).json({ message: "Cliente Atualizado", cliente: result });
+    res.status(200).json({ message: "Cliente atualizado", cliente: result });
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;

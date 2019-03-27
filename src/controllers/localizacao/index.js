@@ -11,7 +11,7 @@ exports.getMotoqueiroLocations = async (req, res, next) => {
   try {
     const locations = await MotoqueiroLocation.find();
     if (!locations) {
-      error = errorHandling.createError("Nenhuma localizacao encontrada.", 404);
+      error = errorHandling.createError("Nenhuma localização encontrada.", 404);
       throw error;
     }
     res.status(200).json({ message: "Sucesso", locations });
@@ -29,14 +29,14 @@ exports.getMotoqueiroLocation = async (req, res, next) => {
     const idMotoqueiro = req.params.idMotoqueiro;
 
     if (!ObjectId.isValid(idMotoqueiro)) {
-      error = errorHandling.createError("ID invalido", 422);
+      error = errorHandling.createError("ID inválido", 422);
       throw error;
     }
 
     const location = await MotoqueiroLocation.findOne({ idMotoqueiro });
     if (!location) {
       error = errorHandling.createError(
-        "Localizacao do motoqueiro nao encontrada.",
+        "Localização do motoqueiro não encontrada.",
         404
       );
       throw error;
@@ -75,7 +75,7 @@ exports.createMotoqueiroLocation = async (req, res, next) => {
     });
 
     res.status(201).json({
-      message: "Localizacao criada com sucesso!",
+      message: "Localização criada com sucesso!",
       motoqueiroLocation: result
     });
   } catch (err) {
@@ -102,7 +102,7 @@ exports.updateMotoqueiroLocation = async (req, res, next) => {
       idMotoqueiro
     });
     if (!motoqueiroLocation) {
-      error = errorHandling.createError("Localizacao nao encontrada", 404);
+      error = errorHandling.createError("Localização não encontrada", 404);
       throw error;
     }
 
@@ -118,7 +118,7 @@ exports.updateMotoqueiroLocation = async (req, res, next) => {
 
     res
       .status(200)
-      .json({ message: "Location Atualizada", motoqueiroLocation: result });
+      .json({ message: "Location atualizada", motoqueiroLocation: result });
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;

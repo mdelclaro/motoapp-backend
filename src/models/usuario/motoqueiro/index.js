@@ -19,7 +19,11 @@ const motoqueiroSchema = new Schema(
       type: String,
       required: true
     },
-    cnh: {
+    cnh1: {
+      type: String,
+      required: false
+    },
+    cnh2: {
       type: String,
       required: false
     },

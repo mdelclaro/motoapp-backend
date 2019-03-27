@@ -27,7 +27,7 @@ exports.getMotoqueiro = async (req, res, next) => {
   try {
     const idMotoqueiro = req.params.idMotoqueiro;
     if (!ObjectId.isValid(idMotoqueiro)) {
-      error = errorHandling.createError("ID invalido.", 422);
+      error = errorHandling.createError("ID inválido.", 422);
       throw error;
     }
     const motoqueiro = await Motoqueiro.findById(idMotoqueiro);
@@ -55,9 +55,6 @@ exports.createMotoqueiro = async (req, res, next) => {
     const nome = req.body.nome;
     const sobrenome = req.body.sobrenome;
     const email = req.body.email;
-    const cnh = req.body.cnh;
-    const moto = req.body.moto;
-    const placa = req.body.placa;
     const senha = await bcrypt.hash(req.body.senha, 10);
 
     const hasMotoqueiro = await Motoqueiro.findOne({ email });
@@ -70,10 +67,7 @@ exports.createMotoqueiro = async (req, res, next) => {
       nome,
       sobrenome,
       email,
-      senha,
-      cnh,
-      moto,
-      placa
+      senha
     });
     const result = await motoqueiro.save();
     res.status(201).json({
@@ -102,6 +96,9 @@ exports.updateMotoqueiro = async (req, res, next) => {
     const senha = req.body.senha;
     const moto = req.body.moto;
     const placa = req.body.placa;
+    const imgPerfil = req.files.imgPerfil[0].path;
+    const cnh1 = req.files.cnh1[0].path;
+    const cnh2 = req.files.cnh2[0].path;
 
     if (email) {
       const hasMotoqueiro = await Motoqueiro.findOne({ email });
@@ -112,13 +109,13 @@ exports.updateMotoqueiro = async (req, res, next) => {
     }
 
     if (!ObjectId.isValid(idMotoqueiro)) {
-      error = errorHandling.createError("ID invalido.", 422);
+      error = errorHandling.createError("ID inválido.", 422);
       throw error;
     }
 
     const motoqueiro = await Motoqueiro.findById(idMotoqueiro);
     if (!motoqueiro) {
-      error = errorHandling.createError("Motoqueiro nao encontrado.", 404);
+      error = errorHandling.createError("Motoqueiro não encontrado.", 404);
       throw error;
     }
 
@@ -126,14 +123,20 @@ exports.updateMotoqueiro = async (req, res, next) => {
     motoqueiro.email = email ? email : motoqueiro.email;
     motoqueiro.moto = moto ? moto : motoqueiro.moto;
     motoqueiro.placa = placa ? placa : motoqueiro.placa;
+    // altera img perfil, cnh frente e verso
+    motoqueiro.imgPerfil = imgPerfil ? imgPerfil : motoqueiro.imgPerfil;
+    motoqueiro.cnh1 = cnh1 ? cnh1 : motoqueiro.cnh1;
+    motoqueiro.cnh2 = cnh2 ? cnh2 : motoqueiro.cnh2;
 
     // altera senha
     if (senha) {
-      cliente.senha = await bcrypt.hash(senha, 10);
+      motoqueiro.senha = await bcrypt.hash(senha, 10);
     }
 
     const result = await motoqueiro.save();
-    res.status(200).json({ message: "Cliente Atualizado", motoqueiro: result });
+    res
+      .status(200)
+      .json({ message: "Motoqueiro atualizado", motoqueiro: result });
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
