@@ -20,10 +20,10 @@ router.post(
   [
     body("nome")
       .trim()
-      .isLength({ min: 3 }),
+      .isLength({ min: 2 }),
     body("sobrenome")
       .trim()
-      .isLength({ min: 3 }),
+      .isLength({ min: 2 }),
     body("email")
       .isEmail()
       .normalizeEmail(),
