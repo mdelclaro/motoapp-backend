@@ -28,6 +28,10 @@ const clienteSchema = new Schema(
     imgPerfil: {
       type: String,
       require: false
+    },
+    status: {
+      type: Number,
+      required: true
     }
   },
   { timestamps: true }

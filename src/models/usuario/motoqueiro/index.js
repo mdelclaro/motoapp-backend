@@ -46,7 +46,11 @@ const motoqueiroSchema = new Schema(
         type: Schema.Types.ObjectId,
         ref: "Avaliacao"
       }
-    ]
+    ],
+    status: {
+      type: Number,
+      required: true
+    }
   },
   { timestamps: true }
 );

@@ -68,7 +68,8 @@ exports.createCliente = async (req, res, next) => {
       nome,
       sobrenome,
       email,
-      senha
+      senha,
+      status: 1
     });
 
     const result = await cliente.save();

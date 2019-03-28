@@ -67,7 +67,8 @@ exports.createMotoqueiro = async (req, res, next) => {
       nome,
       sobrenome,
       email,
-      senha
+      senha,
+      status: 0
     });
     const result = await motoqueiro.save();
     res.status(201).json({
@@ -96,9 +97,14 @@ exports.updateMotoqueiro = async (req, res, next) => {
     const senha = req.body.senha;
     const moto = req.body.moto;
     const placa = req.body.placa;
-    const imgPerfil = req.files.imgPerfil[0].path;
-    const cnh1 = req.files.cnh1[0].path;
-    const cnh2 = req.files.cnh2[0].path;
+    const imgPerfil = req.files.imgPerfil ? req.files.imgPerfil[0].path : null;
+    const cnh1 = req.files.cnh1 ? req.files.cnh1[0].path : null;
+    const cnh2 = req.files.cnh2 ? req.files.cnh2[0].path : null;
+
+    if (!ObjectId.isValid(idMotoqueiro)) {
+      error = errorHandling.createError("ID inválido.", 422);
+      throw error;
+    }
 
     if (email) {
       const hasMotoqueiro = await Motoqueiro.findOne({ email });
@@ -108,29 +114,30 @@ exports.updateMotoqueiro = async (req, res, next) => {
       }
     }
 
-    if (!ObjectId.isValid(idMotoqueiro)) {
-      error = errorHandling.createError("ID inválido.", 422);
-      throw error;
-    }
-
     const motoqueiro = await Motoqueiro.findById(idMotoqueiro);
     if (!motoqueiro) {
       error = errorHandling.createError("Motoqueiro não encontrado.", 404);
       throw error;
     }
 
-    // altera email/moto/placa
+    // altera email
     motoqueiro.email = email ? email : motoqueiro.email;
-    motoqueiro.moto = moto ? moto : motoqueiro.moto;
-    motoqueiro.placa = placa ? placa : motoqueiro.placa;
-    // altera img perfil, cnh frente e verso
-    motoqueiro.imgPerfil = imgPerfil ? imgPerfil : motoqueiro.imgPerfil;
-    motoqueiro.cnh1 = cnh1 ? cnh1 : motoqueiro.cnh1;
-    motoqueiro.cnh2 = cnh2 ? cnh2 : motoqueiro.cnh2;
 
     // altera senha
     if (senha) {
       motoqueiro.senha = await bcrypt.hash(senha, 10);
+    }
+
+    // altera img perfil, placa e moto
+    motoqueiro.moto = moto ? moto : motoqueiro.moto;
+    motoqueiro.placa = placa ? placa : motoqueiro.placa;
+    motoqueiro.imgPerfil = imgPerfil ? imgPerfil : motoqueiro.imgPerfil;
+
+    // altera cnh e status para ativo
+    if (cnh1 && cnh2) {
+      motoqueiro.cnh1 = cnh1;
+      motoqueiro.cnh2 = cnh2;
+      motoqueiro.status = 1;
     }
 
     const result = await motoqueiro.save();
