@@ -1,6 +1,8 @@
 const { validationResult } = require("express-validator/check");
 const ObjectId = require("mongoose").Types.ObjectId;
 const bcrypt = require("bcrypt");
+const fs = require("fs");
+const path = require("path");
 
 const Motoqueiro = require("../../../models/usuario/motoqueiro/");
 const errorHandling = require("../../../utils/error-handling/");
@@ -135,6 +137,12 @@ exports.updateMotoqueiro = async (req, res, next) => {
 
     // altera cnh e status para ativo
     if (cnh1 && cnh2) {
+      const path1 = path.resolve() + path.sep + motoqueiro.cnh1;
+      const path2 = path.resolve() + path.sep + motoqueiro.cnh2;
+      if (fs.existsSync(path1) && fs.existsSync(path2)) {
+        await fs.unlinkSync(path1);
+        await fs.unlinkSync(path2);
+      }
       motoqueiro.cnh1 = cnh1;
       motoqueiro.cnh2 = cnh2;
       motoqueiro.status = 1;
