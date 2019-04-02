@@ -50,7 +50,7 @@ exports.getMotoqueiroLocation = async (req, res, next) => {
   }
 };
 
-// Cria localizacao do motoqueiro
+// Cria/Atualiza localizacao do motoqueiro
 exports.createMotoqueiroLocation = async (req, res, next) => {
   try {
     const errors = validationResult(req);
@@ -62,21 +62,46 @@ exports.createMotoqueiroLocation = async (req, res, next) => {
     const location = req.body.location;
     const idMotoqueiro = req.body.idMotoqueiro;
 
-    const motoqueiroLocation = new MotoqueiroLocation({
-      idMotoqueiro,
-      location
-    });
+    if (!ObjectId.isValid(idMotoqueiro)) {
+      error = errorHandling.createError("ID inválido", 422);
+      throw error;
+    }
 
-    const result = await motoqueiroLocation.save();
+    const motoqueiroLocation = await MotoqueiroLocation.findOne({
+      idMotoqueiro
+    });
+    if (!motoqueiroLocation) {
+      console.log("criar");
+      const motoqueiroLocation = new MotoqueiroLocation({
+        idMotoqueiro,
+        location
+      });
+
+      const result = await motoqueiroLocation.save();
+      res.status(201).json({
+        message: "Localização criada com sucesso!",
+        motoqueiroLocation: result
+      });
+    } else {
+      console.log("atualizar");
+      motoqueiroLocation.location = location;
+
+      const result = await motoqueiroLocation.save();
+
+      let socket = io.getIO();
+      socket.sockets.in(idMotoqueiro).emit("locationChanged", {
+        coords: location
+      });
+
+      res.status(200).json({
+        message: "Location atualizada",
+        motoqueiroLocation: result
+      });
+    }
 
     io.getIO().emit("motoqueiroLocation", {
       action: "create",
       motoqueiroLocation
-    });
-
-    res.status(201).json({
-      message: "Localização criada com sucesso!",
-      motoqueiroLocation: result
     });
   } catch (err) {
     if (!err.statusCode) {
@@ -97,6 +122,11 @@ exports.updateMotoqueiroLocation = async (req, res, next) => {
 
     const location = req.body.location;
     const idMotoqueiro = req.params.idMotoqueiro;
+
+    if (!ObjectId.isValid(idMotoqueiro)) {
+      error = errorHandling.createError("ID inválido", 422);
+      throw error;
+    }
 
     const motoqueiroLocation = await MotoqueiroLocation.findOne({
       idMotoqueiro

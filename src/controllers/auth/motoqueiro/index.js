@@ -31,7 +31,7 @@ exports.login = async (req, res, next) => {
         userId: motoqueiro._id.toString()
       },
       privateKey,
-      { expiresIn: "99999h", algorithm: "RS256" }
+      { expiresIn: "1h", algorithm: "RS256" }
     );
     const refreshToken = jwt.sign(
       {

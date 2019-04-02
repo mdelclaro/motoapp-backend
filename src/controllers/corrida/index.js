@@ -68,7 +68,8 @@ exports.createCorrida = async (req, res, next) => {
     const destino = req.body.destino;
     const distancia = req.body.distancia;
     const tempo = req.body.tempo;
-    const idCliente = req.userId;
+    // const idCliente = req.userId;
+    const idCliente = req.body.idCliente;
     const status = 0;
 
     const corrida = new Corrida({
@@ -243,7 +244,6 @@ exports.handleDispatch = async (corrida, cliente) => {
     //motoqueiros conectados
     let socket = io.getIO();
     const drivers = socket.of("/drivers").connected;
-
     if (socket.engine.clientsCount > 0) {
       let distances = [];
 
@@ -270,6 +270,7 @@ exports.handleDispatch = async (corrida, cliente) => {
             originCoordinates,
             1
           );
+          console.log(distance);
           distances.push({ userId: idMotoqueiro, distance, socket });
         }
       }

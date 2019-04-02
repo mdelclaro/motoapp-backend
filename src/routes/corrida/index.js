@@ -22,9 +22,6 @@ router.post(
     body("destino")
       .not()
       .isEmpty(),
-    body("status")
-      .not()
-      .isEmpty(),
     body("distancia")
       .not()
       .isEmpty(),
@@ -32,7 +29,7 @@ router.post(
       .not()
       .isEmpty()
   ],
-  auth,
+  // auth,
   corridaController.createCorrida
 );
 
@@ -46,13 +43,11 @@ router.put(
     body("idMotoqueiro")
       .trim()
       .escape()
-      .not()
-      .isEmpty(),
+      .optional(),
     body("status")
       .trim()
       .escape()
-      .not()
-      .isEmpty()
+      .optional()
   ],
   auth,
   corridaController.updateCorrida
