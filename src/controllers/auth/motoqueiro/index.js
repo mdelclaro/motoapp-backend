@@ -92,7 +92,8 @@ exports.refreshToken = async (req, res, next) => {
     res.status(200).json({
       token,
       userId: motoqueiro._id.toString(),
-      expiryDate: expiryDate.toString()
+      expiryDate: expiryDate.toString(),
+      accountStatus: motoqueiro.status
     });
   } catch (err) {
     if (!err.statusCode) {
