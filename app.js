@@ -95,11 +95,27 @@ mongoose
       socket.on("disconnect", () => {
         socket.removeAllListeners();
       });
+
+      // mandar lista de motoqueiros quando se conectar
+      const drivers = io.of("/drivers").connected;
+      let driversList = [];
+      if (Object.keys(drivers).length > 0) {
+        for (let key in drivers) {
+          driversList.push({
+            userId: drivers[key].userId,
+            coords: drivers[key].coords
+          });
+        }
+        io.sockets.emit("fetchMotoqueiros", {
+          motoqueiros: driversList
+        });
+      }
     });
     //drivers
     io.of("/drivers").on("connection", socket => {
       socket.on("join", data => {
         socket.userId = data.id.toString();
+        socket.coords = data.coords;
         socket.join(socket.userId);
       });
       socket.on("disconnect", () => {

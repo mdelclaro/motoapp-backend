@@ -61,6 +61,7 @@ exports.createMotoqueiroLocation = async (req, res, next) => {
 
     const location = req.body.location;
     const idMotoqueiro = req.body.idMotoqueiro;
+    let socket = io.getIO();
 
     if (!ObjectId.isValid(idMotoqueiro)) {
       error = errorHandling.createError("ID inválido", 422);
@@ -71,7 +72,6 @@ exports.createMotoqueiroLocation = async (req, res, next) => {
       idMotoqueiro
     });
     if (!motoqueiroLocation) {
-      console.log("criar");
       const motoqueiroLocation = new MotoqueiroLocation({
         idMotoqueiro,
         location
@@ -83,12 +83,10 @@ exports.createMotoqueiroLocation = async (req, res, next) => {
         motoqueiroLocation: result
       });
     } else {
-      console.log("atualizar");
       motoqueiroLocation.location = location;
 
       const result = await motoqueiroLocation.save();
 
-      let socket = io.getIO();
       socket.sockets.in(idMotoqueiro).emit("locationChanged", {
         coords: location
       });
@@ -99,11 +97,26 @@ exports.createMotoqueiroLocation = async (req, res, next) => {
       });
     }
 
-    io.getIO().emit("motoqueiroLocation", {
-      action: "create",
-      motoqueiroLocation
-    });
+    // atualizar as coordenadas do motoqueiro no socket
+    const drivers = socket.of("/drivers").connected;
+    let driversList = [];
+
+    if (Object.keys(drivers).length > 0) {
+      for (let key in drivers) {
+        if (drivers[key].userId === idMotoqueiro) {
+          socket.of("/drivers").connected[key].coords = location;
+        }
+        driversList.push({
+          userId: socket.of("/drivers").connected[key].userId,
+          coords: socket.of("/drivers").connected[key].coords
+        });
+      }
+      socket.sockets.emit("fetchMotoqueiros", {
+        motoqueiros: driversList
+      });
+    }
   } catch (err) {
+    console.log(err);
     if (!err.statusCode) {
       err.statusCode = 500;
     }
