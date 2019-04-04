@@ -49,7 +49,8 @@ exports.login = async (req, res, next) => {
       refreshToken,
       expiryDate: expiryDate.toString(),
       userId: motoqueiro._id.toString(),
-      accountStatus: motoqueiro.status
+      accountStatus: motoqueiro.status,
+      imgPerfil: motoqueiro.imgPerfil
     });
   } catch (err) {
     if (!err.statusCode) {

@@ -47,6 +47,10 @@ const motoqueiroSchema = new Schema(
         ref: "Avaliacao"
       }
     ],
+    imgPerfil: {
+      type: String,
+      require: false
+    },
     status: {
       type: Number,
       required: true
