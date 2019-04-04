@@ -55,7 +55,19 @@ app.use(
     { name: "cnh2" }
   ])
 );
-app.use("/images", express.static(path.join(__dirname, "images")));
+
+// Servir imagens
+app.use(
+  "/images",
+  express.static(path.join(__dirname, "images"), { fallthrough: true })
+);
+
+// Imagem não encontrada
+app.get("/images*", (req, res) => {
+  res
+    .status(200)
+    .sendFile(path.resolve() + path.sep + "images" + path.sep + "avatar.png");
+});
 
 // Rotas
 app.use("/motoapp/v1/corrida", corridaRoutes);
