@@ -108,14 +108,6 @@ exports.updateMotoqueiro = async (req, res, next) => {
       throw error;
     }
 
-    if (email) {
-      const hasMotoqueiro = await Motoqueiro.findOne({ email });
-      if (hasMotoqueiro) {
-        error = errorHandling.createError("E-mail em uso", 422);
-        throw error;
-      }
-    }
-
     const motoqueiro = await Motoqueiro.findById(idMotoqueiro);
     if (!motoqueiro) {
       error = errorHandling.createError("Motoqueiro não encontrado.", 404);
@@ -123,30 +115,49 @@ exports.updateMotoqueiro = async (req, res, next) => {
     }
 
     // altera email
-    motoqueiro.email = email ? email : motoqueiro.email;
+    if (email) {
+      const hasMotoqueiro = await Motoqueiro.findOne({ email });
+      if (hasMotoqueiro) {
+        error = errorHandling.createError("Email em uso", 422);
+        throw error;
+      }
+      motoqueiro.email = email;
+    }
 
     // altera senha
     if (senha) {
       motoqueiro.senha = await bcrypt.hash(senha, 10);
     }
 
-    // altera img perfil, placa e moto
-    motoqueiro.moto = moto ? moto : motoqueiro.moto;
-    motoqueiro.placa = placa ? placa : motoqueiro.placa;
-    motoqueiro.imgPerfil = imgPerfil ? imgPerfil : motoqueiro.imgPerfil;
+    // altera img de perfil
+    if (imgPerfil) {
+      if (motoqueiro.imgPerfil) {
+        const pathImg = path.resolve() + path.sep + motoqueiro.imgPerfil;
+        if (fs.existsSync(pathImg)) {
+          await fs.unlinkSync(pathImg);
+        }
+      }
+      motoqueiro.imgPerfil = imgPerfil;
+    }
 
     // altera cnh e status para ativo
     if (cnh1 && cnh2) {
-      const path1 = path.resolve() + path.sep + motoqueiro.cnh1;
-      const path2 = path.resolve() + path.sep + motoqueiro.cnh2;
-      if (fs.existsSync(path1) && fs.existsSync(path2)) {
-        await fs.unlinkSync(path1);
-        await fs.unlinkSync(path2);
+      if (motoqueiro.cnh1 && motoqueiro.cnh2) {
+        const path1 = path.resolve() + path.sep + motoqueiro.cnh1;
+        const path2 = path.resolve() + path.sep + motoqueiro.cnh2;
+        if (fs.existsSync(path1) && fs.existsSync(path2)) {
+          await fs.unlinkSync(path1);
+          await fs.unlinkSync(path2);
+        }
       }
       motoqueiro.cnh1 = cnh1;
       motoqueiro.cnh2 = cnh2;
       motoqueiro.status = 1;
     }
+
+    // altera placa e moto
+    motoqueiro.moto = moto ? moto : motoqueiro.moto;
+    motoqueiro.placa = placa ? placa : motoqueiro.placa;
 
     const result = await motoqueiro.save();
     res

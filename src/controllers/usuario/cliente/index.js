@@ -1,6 +1,8 @@
 const { validationResult } = require("express-validator/check");
 const ObjectId = require("mongoose").Types.ObjectId;
 const bcrypt = require("bcrypt");
+const fs = require("fs");
+const path = require("path");
 
 const Cliente = require("../../../models/usuario/cliente/");
 const errorHandling = require("../../../utils/error-handling/");
@@ -97,15 +99,7 @@ exports.updateCliente = async (req, res, next) => {
     const idCliente = req.params.idCliente;
     const email = req.body.email;
     const senha = req.body.senha;
-    const imgPerfil = req.files.imgPerfil[0].path;
-
-    if (email) {
-      const hasCliente = await Cliente.findOne({ email });
-      if (hasCliente) {
-        error = errorHandling.createError("E-mail em uso", 422);
-        throw error;
-      }
-    }
+    const imgPerfil = req.files.imgPerfil ? req.files.imgPerfil[0].path : null;
 
     if (!ObjectId.isValid(idCliente)) {
       error = errorHandling.createError("ID inválido.", 422);
@@ -117,14 +111,31 @@ exports.updateCliente = async (req, res, next) => {
       error = errorHandling.createError("Cliente não encontrado.", 404);
       throw error;
     }
+
     // altera email
-    cliente.email = email ? email : cliente.email;
-    // altera img perfil
-    cliente.imgPerfil = imgPerfil ? imgPerfil : cliente.imgPerfil;
+    if (email) {
+      const hasCliente = await Cliente.findOne({ email });
+      if (hasCliente) {
+        error = errorHandling.createError("E-mail em uso", 422);
+        throw error;
+      }
+      cliente.email = email;
+    }
 
     // altera senha
     if (senha) {
       cliente.senha = await bcrypt.hash(senha, 10);
+    }
+
+    // altera img de perfil
+    if (imgPerfil) {
+      if (cliente.imgPerfil) {
+        const pathImg = path.resolve() + path.sep + cliente.imgPerfil;
+        if (fs.existsSync(pathImg)) {
+          await fs.unlinkSync(pathImg);
+        }
+      }
+      cliente.imgPerfil = imgPerfil;
     }
 
     const result = await cliente.save();
