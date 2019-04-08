@@ -70,12 +70,12 @@ app.get("/images*", (req, res) => {
 });
 
 // Rotas
-app.use("/motoapp/v1/corrida", corridaRoutes);
-app.use("/motoapp/v1/usuario/cliente", clienteRoutes);
-app.use("/motoapp/v1/usuario/motoqueiro", motoqueiroRoutes);
-app.use("/motoapp/v1/localizacao", motoqueiroLocationRoutes);
-app.use("/motoapp/v1/avaliacao", avaliacaoRoutes);
-app.use("/motoapp/v1/auth", authRoute);
+app.use("/v1/corrida", corridaRoutes);
+app.use("/v1/usuario/cliente", clienteRoutes);
+app.use("/v1/usuario/motoqueiro", motoqueiroRoutes);
+app.use("/v1/localizacao", motoqueiroLocationRoutes);
+app.use("/v1/avaliacao", avaliacaoRoutes);
+app.use("/v1/auth", authRoute);
 
 // tratamento de erros
 app.use((error, req, res, next) => {

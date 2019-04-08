@@ -3,7 +3,7 @@ const ObjectId = require("mongoose").Types.ObjectId;
 
 const io = require("../../utils/socket/");
 
-const Avalicao = require("../../models/avalicao/");
+const Avalicao = require("../../models/avaliacao/");
 const Cliente = require("../../models/usuario/cliente/");
 const Motoqueiro = require("../../models/usuario/motoqueiro/");
 const errorHandling = require("../../utils/error-handling/");

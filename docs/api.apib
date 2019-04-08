@@ -1,0 +1,168 @@
+FORMAT: 1A
+HOST: http://motoapp.com/v1
+
+# API MotoApp
+
+API Backend da plataforma MotoApp
+
+# API MotoApp [/]
+
+API que trabalha como backend para os dois aplicativos móveis da plataforma MotoApp
+
+# Group Auth
+
+## Auth Cliente [/auth/cliente/]
+
+### Login Cliente [POST]
+Fazer login do cliente (gerar JWT)
+
++ Attributes (object)
+    + email: `email@email.com` (string)
+    + senha: `123456` (string)
+
++ Request (application/json)
+
++ Response 200 (application/json)
+    + Attributes (object)
+        + token: `eyJhbGci` (string)
+        + refreshToken: `dhBur8v` (string)
+        + userId: `5ca39f` (string)
+        + expiryDate: `Sun Feb 01 1998 00:00:00 GMT+0000 (GMT)` (string)
+        + imgPerfil: `images\c228ea5` (string)
+
++ Response 401 (application/json)
+    + Attributes (Error)
+
++ Response 500 (application/json)
+
+## Refresh Token Cliente [/auth/cliente/refreshToken/]
+
+### Refresh Token Cliente [POST]
+Atualizar JWT
+
++ Attributes (object)
+    + refreshToken: `fdC4h9` (string)
+
++ Request (application/json)
+
++ Response 200 (application/json)
+    + Attributes (object)
+        + token: `eyJhbGci` (string)
+        + userId: `5ca39f` (string)
+        + expiryDate: `Sun Feb 01 1998 00:00:00 GMT+0000 (GMT)` (string)
+
++ Response 401 (application/json)
+    + Attributes (Error)
+
++ Response 500 (application/json)
+
+## Auth Motoqueiro [/auth/motoqueiro/]
+
+### Login Motoqueiro [POST]
+Fazer login do motoqueiro (gerar JWT)
+
++ Attributes (object)
+    + email: `email@email.com` (string)
+    + senha: `123456` (string)
+
++ Request (application/json)
+
++ Response 200 (application/json)
+    + Attributes (object)
+        + token: `eyJhbGci` (string)
+        + refreshToken: `dhBur8v` (string)
+        + userId: `5ca39f` (string)
+        + expiryDate: `Sun Feb 01 1998 00:00:00 GMT+0000 (GMT)` (string)
+        + imgPerfil: `images\c228ea5` (string)
+        + accountStatus: 1 (number)
+
++ Response 401 (application/json)
+    + Attributes (Error)
+
++ Response 500 (application/json)
+
+## Refresh Token Motoqueiro [/auth/motoqueiro/refreshToken/]
+
+### Refresh Token Motoqueiro [POST]
+Atualizar JWT
+
++ Attributes (object)
+    + refreshToken: `fdC4h9` (string)
+
++ Request (application/json)
+
++ Response 200 (application/json)
+    + Attributes (object)
+        + token: `eyJhbGci` (string)
+        + userId: `5ca39f` (string)
+        + expiryDate: `Sun Feb 01 1998 00:00:00 GMT+0000 (GMT)` (string)
+        + accountStatus: 1 (number)
+
++ Response 401 (application/json)
+    + Attributes (Error)
+
++ Response 500 (application/json)
+
+
+# Data Structures
+
+## Cliente (object)
++ _id (string) - ID do cliente
++ nome (string) - Nome do cliente
++ sobrenome (string) - Sobrenome do cliente
++ email (string) - Email do cliente
++ corridas (array[Corrida]) - Corridas pedidas pelo cliente
++ imgPerfil (string) - URL da imagem de perfil do cliente
++ status (number) - Status do cliente. 1 - Ativo, 0 - Inativo
+
+## Motoqueiro (object)
++ _id (string) - ID do motoqueiro
++ nome (string) - Nome do motoqueiro
++ sobrenome (string) - Sobrenome do motoqueiro
++ email (string) - Email do motoqueiro
++ cnh1 (string) - URL da foto da CNH (frente)
++ cnh2 (string) - URL da foto da CNH (verso)
++ moto (string) - Modelo e cor do veículo do motoqueiro
++ placa (string) - Placa do veículo do motoqueiro
++ corridas (array[Corrida]) - Corridas feitas pelo motoqueiro
++ avaliacoes (array[Avaliação]) - Avaliações do motoqueiro
++ imgPerfil (string) - URL da imagem de perfil do motoqueiro
++ status (number) - Status do motoqueiro. 1 - Ativo, 0 - Inativo
+
+## Corrida (object)
++ origem - Origem da corrida
+    + lat: `-22.80014983` (string)
+    + long: `-47.56456563` (string)
+    + local: `R. Paraguai` (string)
++ destino - Destino da corrida
+    + lat: `-23.7851587` (string)
+    + long: `-45.5153302` (string)
+    + local: `Avenida João Pinheiro` (string)
++ distancia (number) - Distacia entre origem e destino da corrida
++ tempo (number) - Minutos entre origem e destino da corrida
++ idCliente (string) - ID do cliente que criou a corrida
++ idMotoqueiro (string) - ID do motoqueiro que aceitou a corrida
++ status (number) - 
+    Status da corrida. 
+    0 - Corrida Solicitada
+    1 - Corrida Aceita
+    2 - Corrida em Andamento
+    3 - Corrida Finalizada
+    4 - Corrida Cancelada
+
+## Localização (object)
++ idMotoqueiro (string) - ID do motoqueiro
++ location - Localização do motoqueiro
+    + lat: `-23.7851587` (string)
+    + long: `-45.5153302` (string)
+    + local: `Avenida João Pinheiro` (string)
+
+## Avaliação
++ nota (number) - Avaliação de 1 a 5 do motoqueiro
++ comentario (string, optional) - Comentário do cliente sobre o motoqueiro
++ idCliente (string) - ID do cliente de criou a avaliação
++ idMotoqueiro (string) - ID do motoqueiro avaliado
+
+## Error (object)
++ statusCode: 401 (number) - Status code
++ message: `Senha inválida` (string) - Mensagem do status
