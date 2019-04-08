@@ -31,7 +31,9 @@ Fazer login do cliente (gerar JWT)
         + imgPerfil: `images\c228ea5` (string)
 
 + Response 401 (application/json)
-    + Attributes (Error)
+    + Attributes (object)
+        + statusCode: 401 (number)
+        + message: `Senha inválida` (string)
 
 + Response 500 (application/json)
 
@@ -52,9 +54,14 @@ Atualizar JWT
         + expiryDate: `Sun Feb 01 1998 00:00:00 GMT+0000 (GMT)` (string)
 
 + Response 401 (application/json)
-    + Attributes (Error)
+    + Attributes (object)
+        + statusCode: 401 (number)
+        + message: `E-mail não cadastrado` (string)
 
 + Response 500 (application/json)
+    + Attributes (object)
+        + statusCode: 500 (number)
+        + message: `Token inválido` (string)
 
 ## Auth Motoqueiro [/auth/motoqueiro/]
 
@@ -77,7 +84,9 @@ Fazer login do motoqueiro (gerar JWT)
         + accountStatus: 1 (number)
 
 + Response 401 (application/json)
-    + Attributes (Error)
+    + Attributes (object)
+        + statusCode: 401 (number)
+        + message: `Senha inválida` (string)
 
 + Response 500 (application/json)
 
@@ -99,10 +108,159 @@ Atualizar JWT
         + accountStatus: 1 (number)
 
 + Response 401 (application/json)
-    + Attributes (Error)
+    + Attributes (object)
+        + statusCode: 401 (number)
+        + message: `E-mail não cadastrado` (string)
+
++ Response 500 (application/json)
+    + Attributes (object)
+        + statusCode: 500 (number)
+        + message: `Token inválido` (string)
+
+# Group Corrida
+
+## Corridas [/corrida/]
+
+### Buscar Corridas [GET]
+Listar corridas
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Bearer token
+
++ Response 200 (application/json)
+    + Attributes (array[Corrida])
+
++ Response 404 (application/json)
+    + Attributes (Error_404)
 
 + Response 500 (application/json)
 
+### Criar Corrida [POST]
+Criar corrida
+
++ Attributes (object)
+    + origem (object, required)
+        + lat: `-22.80014983` (string)
+        + long: `-47.56456563` (string)
+        + local: `R. Paraguai` (string)
+    + destino (object, required)
+        + lat: `-23.7851587` (string)
+        + long: `-45.5153302` (string)
+        + local: `Avenida João Pinheiro` (string)
+    + distancia: 1200 (number, required)
+    + tempo: 8 (number, required)
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Bearer token
+
++ Response 200 (application/json)
+    + Attributes (object)
+        + origem (object)
+            + lat: `-22.80014983` (string)
+            + long: `-47.56456563` (string)
+            + local: `R. Paraguai` (string)
+        + destino (object)
+            + lat: `-23.7851587` (string)
+            + long: `-45.5153302` (string)
+            + local: `Avenida João Pinheiro` (string)
+        + distancia: 1200 (number)
+        + tempo: 8 (number)
+        + idCliente: `5ca39f` (string)
+        + status: 0 (number)
+
++ Response 401 (application/json)
+    + Attributes (Error_401)
+
++ Response 422 (application/json)
+    + Attributes (Error_422)
+
++ Response 500 (application/json)
+
+## Corrida [/corrida/{idCorrida}]
+
++ Parameters
+    + idCorrida: `5c9528711` (string, required) - ID da corrida
+
+### Buscar Corrida [GET]
+Listar corrida
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Bearer token
+
++ Response 200 (application/json)
+    + Attributes (Corrida)
+
++ Response 404 (application/json)
+    + Attributes (Error_404)
+
++ Response 422 (application/json)
+    + Attributes (Error_422)
+
++ Response 500 (application/json)
+
+### Atualizar Corrida [PUT]
+Atualizar corrida. Parâmetro idMotoqueiro required apenas quando status == 1
+
++ Attributes (object)
+    + idMotoqueiro: `5ca39f` (string, optional)
+    + status: 1 (number, required)
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Bearer token
+
++ Response 200 (application/json)
+    + Attributes (Corrida)
+
++ Response 401 (application/json)
+    + Attributes (Error_401)
+
++ Response 404 (application/json)
+    + Attributes (Error_404)
+
++ Response 422 (application/json)
+    + Attributes (Error_422)
+
++ Response 500 (application/json)
+
+### Deletar Corrida [DELETE]
+Deletar corrida
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Bearer token
+
++ Response 200 (application/json)
+    + Attributes (object)
+        + statusCode: 200 (number)
+        + message: `Deletado` (string)
+
++ Response 401 (application/json)
+    + Attributes (Error_401)
+
++ Response 403 (application/json)
+    + Attributes (Error_404)
+
++ Response 404 (application/json)
+    + Attributes (Error_404)
+
++ Response 422 (application/json)
+    + Attributes (Error_422)
+
++ Response 500 (application/json)
 
 # Data Structures
 
@@ -130,19 +288,19 @@ Atualizar JWT
 + status (number) - Status do motoqueiro. 1 - Ativo, 0 - Inativo
 
 ## Corrida (object)
-+ origem - Origem da corrida
++ origem (object, required) - Origem da corrida
     + lat: `-22.80014983` (string)
     + long: `-47.56456563` (string)
     + local: `R. Paraguai` (string)
-+ destino - Destino da corrida
++ destino (object, required) - Destino da corrida
     + lat: `-23.7851587` (string)
     + long: `-45.5153302` (string)
     + local: `Avenida João Pinheiro` (string)
-+ distancia (number) - Distacia entre origem e destino da corrida
-+ tempo (number) - Minutos entre origem e destino da corrida
-+ idCliente (string) - ID do cliente que criou a corrida
-+ idMotoqueiro (string) - ID do motoqueiro que aceitou a corrida
-+ status (number) - 
++ distancia: 1200 (number, required) - Distacia entre origem e destino da corrida
++ tempo: 8 (number, required) - Minutos entre origem e destino da corrida
++ idCliente: `5ca39f` (string, required) - ID do cliente que criou a corrida
++ idMotoqueiro: `9ca32a` (string, optional) - ID do motoqueiro que aceitou a corrida
++ status: 0 (number) - 
     Status da corrida. 
     0 - Corrida Solicitada
     1 - Corrida Aceita
@@ -151,18 +309,30 @@ Atualizar JWT
     4 - Corrida Cancelada
 
 ## Localização (object)
-+ idMotoqueiro (string) - ID do motoqueiro
++ idMotoqueiro: `9ca32a` (string) - ID do motoqueiro
 + location - Localização do motoqueiro
     + lat: `-23.7851587` (string)
     + long: `-45.5153302` (string)
     + local: `Avenida João Pinheiro` (string)
 
-## Avaliação
-+ nota (number) - Avaliação de 1 a 5 do motoqueiro
-+ comentario (string, optional) - Comentário do cliente sobre o motoqueiro
-+ idCliente (string) - ID do cliente de criou a avaliação
-+ idMotoqueiro (string) - ID do motoqueiro avaliado
+## Avaliação (object)
++ nota: 5 (number) - Avaliação de 1 a 5 do motoqueiro
++ comentario: `Ótimo` (string, optional) - Comentário do cliente sobre o motoqueiro
++ idCliente: `5ca39f` (string) - ID do cliente de criou a avaliação
++ idMotoqueiro: `9ca32a` (string) - ID do motoqueiro avaliado
 
-## Error (object)
+## `Error_401` (object)
 + statusCode: 401 (number) - Status code
-+ message: `Senha inválida` (string) - Mensagem do status
++ message: `Not authenticated` (string) - Mensagem do status
+
+## `Error_403` (object)
++ statusCode: 403 (number) - Status code
++ message: `Não autorizado` (string) - Mensagem do status
+
+## `Error_404` (object)
++ statusCode: 404 (number) - Status code
++ message: `Recurso não encontrado` (string) - Mensagem do status
+
+## `Error_422` (object)
++ statusCode: 422 (number) - Status code
++ message: `Parâmetro inválido ou não informado` (string) - Mensagem do status

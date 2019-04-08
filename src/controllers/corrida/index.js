@@ -68,8 +68,8 @@ exports.createCorrida = async (req, res, next) => {
     const destino = req.body.destino;
     const distancia = req.body.distancia;
     const tempo = req.body.tempo;
-    // const idCliente = req.userId;
-    const idCliente = req.body.idCliente;
+    const idCliente = req.userId;
+    // const idCliente = req.body.idCliente;
     const status = 0;
 
     const corrida = new Corrida({
