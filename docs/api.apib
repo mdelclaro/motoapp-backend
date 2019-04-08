@@ -5,6 +5,7 @@ HOST: http://motoapp.com/v1
 
 API Backend da plataforma MotoApp
 
+# Group Sobre
 # API MotoApp [/]
 
 API que trabalha como backend para os dois aplicativos móveis da plataforma MotoApp
@@ -117,6 +118,290 @@ Atualizar JWT
         + statusCode: 500 (number)
         + message: `Token inválido` (string)
 
+# Group Usuário
+
+## Clientes [/usuario/cliente/]
+
+### Buscar Clientes [GET]
+Listar clientes
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Bearer token
+
++ Response 200 (application/json)
+    + Attributes (object)
+        + message: `Sucesso` (string)
+        + clientes (array[Cliente])
+
++ Response 401 (application/json)
+    + Attributes (Error_401)
+
++ Response 404 (application/json)
+    + Attributes (Error_404)
+
++ Response 500 (application/json)
+
+### Criar Cliente [POST]
+Criar cliente
+
++ Attributes (object)
+    + nome: `John` (string, required)
+    + sobrenome: `Doe` (string, required)
+    + email: `email@email.com` (string, required)
+    + senha: `123456` (string, required)
+
++ Request (application/json)
+
++ Response 201 (application/json)
+    + Attributes (object)
+        + message: `Cliente criado com sucesso!`
+        + cliente (object)
+            + _id: `5c7d3f` (string)
+            + nome: `John` (string)
+            + sobrenome: `Doe` (string)
+            + email: `email@email.com` (string)
+            + status: 1 (number)
+
++ Response 422 (application/json)
+    + Attributes (Error_422)
+
++ Response 500 (application/json)
+
+## Cliente [/usuario/cliente/{idCliente}]
+
++ Parameters
+    + idCliente: `5c9dc711` (string, required) - ID do cliente
+
+### Buscar Cliente [GET]
+Listar cliente
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Bearer token
+
++ Response 200 (application/json)
+    + Attributes (object)
+        + message: `Sucesso` (string)
+        + cliente (Cliente)
+
++ Response 401 (application/json)
+    + Attributes (Error_401)
+
++ Response 404 (application/json)
+    + Attributes (Error_404)
+
++ Response 422 (application/json)
+    + Attributes (Error_422)
+
++ Response 500 (application/json)
+
+### Atualizar Cliente [PUT]
+Atualizar cliente
+
++ Request (multipart/form-data; boundary=---BOUNDARY)
+
+    + Body
+
+            ---BOUNDARY
+            Content-Disposition: form-data; name="email"
+            Content-Type: text/plain
+
+            "email@email.com"
+            ---BOUNDARY
+            Content-Disposition: form-data; name="senha"
+            Content-Type: text/plain
+
+            "123456"
+            ---BOUNDARY
+            Content-Disposition: form-data; name="imgPerfil"
+            Content-Type: image/jpeg
+            Content-Type: image/jpg
+            Content-Type: image/png
+
+            "content of image"
+            ---BOUNDARY--
+
+    + Headers
+    
+            Authorization: Bearer token
+
++ Response 200 (application/json)
+    + Attributes (object)
+        + message: `Cliente atualizado` (string)
+        + cliente (Cliente)
+
++ Response 401 (application/json)
+    + Attributes (Error_401)
+
++ Response 403 (application/json)
+    + Attributes (Error_403)
+
++ Response 404 (application/json)
+    + Attributes (Error_404)
+
++ Response 422 (application/json)
+    + Attributes (Error_422)
+
++ Response 500 (application/json)
+
+## Motoqueiros [/usuario/motoqueiro/]
+
+### Buscar Motoqueiros [GET]
+Listar motoqueiros
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Bearer token
+
++ Response 200 (application/json)
+    + Attributes (object)
+        + message: `Sucesso` (string)
+        + motoqueiros (array[Motoqueiro])
+
++ Response 401 (application/json)
+    + Attributes (Error_401)
+
++ Response 404 (application/json)
+    + Attributes (Error_404)
+
++ Response 500 (application/json)
+
+### Criar Motoqueiro [POST]
+Criar motoqueiro
+
++ Attributes (object)
+    + nome: `John` (string, required)
+    + sobrenome: `Doe` (string, required)
+    + email: `email@email.com` (string, required)
+    + senha: `123456` (string, required)
+
++ Request (application/json)
+
++ Response 201 (application/json)
+    + Attributes (object)
+        + message: `Motoqueiro criado com sucesso!`
+        + cliente (object)
+            + _id: `5c7d3f` (string)
+            + nome: `John` (string)
+            + sobrenome: `Doe` (string)
+            + email: `email@email.com` (string)
+            + status: 1 (number)
+
++ Response 422 (application/json)
+    + Attributes (Error_422)
+
++ Response 500 (application/json)
+
+## Motoqueiro [/usuario/motoqueiro/{idMotoqueiro}]
+
++ Parameters
+    + idMotoqueiro: `5c9dc711` (string, required) - ID do motoqueiro
+
+### Buscar Motoqueiro [GET]
+Listar motoqueiro
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Bearer token
+
++ Response 200 (application/json)
+    + Attributes (object)
+        + message: `Sucesso` (string)
+        + motoqueiro (Motoqueiro)
+
++ Response 401 (application/json)
+    + Attributes (Error_401)
+
++ Response 404 (application/json)
+    + Attributes (Error_404)
+
++ Response 422 (application/json)
+    + Attributes (Error_422)
+
++ Response 500 (application/json)
+
+### Atualizar Motoqueiro [PUT]
+Atualizar motoqueiro
+
++ Request (multipart/form-data; boundary=---BOUNDARY)
+
+    + Body
+
+            ---BOUNDARY
+            Content-Disposition: form-data; name="email"
+            Content-Type: text/plain
+
+            "email@email.com"
+            ---BOUNDARY
+            Content-Disposition: form-data; name="senha"
+            Content-Type: text/plain
+
+            "123456"
+            ---BOUNDARY
+            Content-Disposition: form-data; name="moto"
+            Content-Type: text/plain
+
+            "Titan 125 - Preta"
+            ---BOUNDARY
+            Content-Disposition: form-data; name="placa"
+            Content-Type: text/plain
+
+            "gvg5478"
+            ---BOUNDARY
+            Content-Disposition: form-data; name="imgPerfil"
+            Content-Type: image/jpeg
+            Content-Type: image/jpg
+            Content-Type: image/png
+
+            "content of image"
+            ---BOUNDARY
+            Content-Disposition: form-data; name="cnh1"
+            Content-Type: image/jpeg
+            Content-Type: image/jpg
+            Content-Type: image/png
+
+            "content of image"
+            ---BOUNDARY
+            Content-Disposition: form-data; name="cnh2"
+            Content-Type: image/jpeg
+            Content-Type: image/jpg
+            Content-Type: image/png
+
+            "content of image"
+            ---BOUNDARY--
+
+    + Headers
+    
+            Authorization: Bearer token
+
++ Response 200 (application/json)
+    + Attributes (object)
+        + message: `Motoqueiro atualizado` (string)
+        + cliente (Motoqueiro)
+
++ Response 401 (application/json)
+    + Attributes (Error_401)
+
++ Response 403 (application/json)
+    + Attributes (Error_403)
+
++ Response 404 (application/json)
+    + Attributes (Error_404)
+
++ Response 422 (application/json)
+    + Attributes (Error_422)
+
++ Response 500 (application/json)
+
 # Group Corrida
 
 ## Corridas [/corrida/]
@@ -132,6 +417,9 @@ Listar corridas
 
 + Response 200 (application/json)
     + Attributes (array[Corrida])
+
++ Response 401 (application/json)
+    + Attributes (Error_401)
 
 + Response 404 (application/json)
     + Attributes (Error_404)
@@ -159,20 +447,23 @@ Criar corrida
     
             Authorization: Bearer token
 
-+ Response 200 (application/json)
++ Response 201 (application/json)
     + Attributes (object)
-        + origem (object)
-            + lat: `-22.80014983` (string)
-            + long: `-47.56456563` (string)
-            + local: `R. Paraguai` (string)
-        + destino (object)
-            + lat: `-23.7851587` (string)
-            + long: `-45.5153302` (string)
-            + local: `Avenida João Pinheiro` (string)
-        + distancia: 1200 (number)
-        + tempo: 8 (number)
-        + idCliente: `5ca39f` (string)
-        + status: 0 (number)
+        + message: `Corrida criada com sucesso!`
+        + corrida (object)
+            + _id: `5asb8d` (string)
+            + origem (object)
+                + lat: `-22.80014983` (string)
+                + long: `-47.56456563` (string)
+                + local: `R. Paraguai` (string)
+            + destino (object)
+                + lat: `-23.7851587` (string)
+                + long: `-45.5153302` (string)
+                + local: `Avenida João Pinheiro` (string)
+            + distancia: 1200 (number)
+            + tempo: 8 (number)
+            + idCliente: `5ca39f` (string)
+            + status: 0 (number)
 
 + Response 401 (application/json)
     + Attributes (Error_401)
@@ -199,6 +490,9 @@ Listar corrida
 + Response 200 (application/json)
     + Attributes (Corrida)
 
++ Response 401 (application/json)
+    + Attributes (Error_401)
+
 + Response 404 (application/json)
     + Attributes (Error_404)
 
@@ -221,10 +515,15 @@ Atualizar corrida. Parâmetro idMotoqueiro required apenas quando status == 1
             Authorization: Bearer token
 
 + Response 200 (application/json)
-    + Attributes (Corrida)
+    + Attributes (object)
+        + message: `Corrida atualizada` (string)
+        + corrida (Corrida)
 
 + Response 401 (application/json)
     + Attributes (Error_401)
+
++ Response 403 (application/json)
+    + Attributes (Error_403)
 
 + Response 404 (application/json)
     + Attributes (Error_404)
@@ -252,7 +551,171 @@ Deletar corrida
     + Attributes (Error_401)
 
 + Response 403 (application/json)
+    + Attributes (Error_403)
+
++ Response 404 (application/json)
     + Attributes (Error_404)
+
++ Response 422 (application/json)
+    + Attributes (Error_422)
+
++ Response 500 (application/json)
+
+# Group Localização
+
+## Localizações [/localizacao/]
+
+### Buscar Localizações [GET]
+Listar localizações
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Bearer token
+
++ Response 200 (application/json)
+    + Attributes (array[Localização])
+
++ Response 401 (application/json)
+    + Attributes (Error_401)
+
++ Response 404 (application/json)
+    + Attributes (Error_404)
+
++ Response 500 (application/json)
+
+### Criar Localização [POST]
+Criar Localização, ou atualizar
+
++ Attributes (object)
+    + location (object)
+        + lat: `-22.80014983` (string)
+        + long: `-47.56456563` (string)
+        + local: `R. Assis` (string)
+    + idMotoqueiro: `5fabD9` (string)
+
++ Request (application/json)
+ 
+    + Headers
+    
+            Authorization: Bearer token
+
++ Response 200 (application/json)
+    + Attributes (object)
+        + message: `Localização atualizada/criada com sucesso!` (string)
+        + motoqueiroLocation (Localização)
+
++ Response 401 (application/json)
+    + Attributes (Error_401)
+
++ Response 403 (application/json)
+    + Attributes (Error_403)
+
++ Response 404 (application/json)
+    + Attributes (Error_404)
+
++ Response 500 (application/json)
+
+## Localização [/localizacao/{idMotoqueiro}]
+
++ Parameters
+    + idMotoqueiro: `5c9528711` (string, required) - ID do motoqueiro
+
+### Buscar Localização [GET]
+Listar localização
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Bearer token
+
++ Response 200 (application/json)
+    + Attributes (Localização)
+
++ Response 401 (application/json)
+    + Attributes (Error_401)
+
++ Response 404 (application/json)
+    + Attributes (Error_404)
+
++ Response 422 (application/json)
+    + Attributes (Error_422)
+
++ Response 500 (application/json)
+
+# Group Avaliação
+
+## Avaliações [/avaliacao/]
+
+### Buscar Avaliações [GET]
+Listar avaliações
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Bearer token
+
++ Response 200 (application/json)
+    + Attributes (array[Avaliação])
+
++ Response 401 (application/json)
+    + Attributes (Error_401)
+
++ Response 404 (application/json)
+    + Attributes (Error_404)
+
++ Response 500 (application/json)
+
+### Criar Avaliação [POST]
+Criar avaliação
+
++ Attributes (object)
+    + nota: 5 (number)
+    + comentario: `Ótimo` (string, optional)
+    + idCliente: `8dgA3d` (string)
+    + idMotoqueiro: `5fabD9` (string)
+
++ Request (application/json)
+ 
+    + Headers
+    
+            Authorization: Bearer token
+
++ Response 200 (application/json)
+    + Attributes (object)
+        + message: `Avaliação criada com sucesso!` (string)
+        + motoqueiroLocation (Avaliação)
+
++ Response 401 (application/json)
+    + Attributes (Error_401)
+
++ Response 404 (application/json)
+    + Attributes (Error_404)
+
++ Response 500 (application/json)
+
+## Avaliação [/avaliacao/{idAvaliacao}]
+
++ Parameters
+    + idAvaliacao: `5c9528711` (string, required) - ID da avaliação
+
+### Buscar Avaliação [GET]
+Listar avaliação
+
++ Request (application/json)
+
+    + Headers
+    
+            Authorization: Bearer token
+
++ Response 200 (application/json)
+    + Attributes (Avaliação)
+
++ Response 401 (application/json)
+    + Attributes (Error_401)
 
 + Response 404 (application/json)
     + Attributes (Error_404)
@@ -265,27 +728,27 @@ Deletar corrida
 # Data Structures
 
 ## Cliente (object)
-+ _id (string) - ID do cliente
-+ nome (string) - Nome do cliente
-+ sobrenome (string) - Sobrenome do cliente
-+ email (string) - Email do cliente
++ _id: `5c7d3f` (string) - ID do cliente
++ nome: `John` (string) - Nome do cliente
++ sobrenome: `Doe` (string) - Sobrenome do cliente
++ email: `email@email.com` (string) - Email do cliente
 + corridas (array[Corrida]) - Corridas pedidas pelo cliente
-+ imgPerfil (string) - URL da imagem de perfil do cliente
-+ status (number) - Status do cliente. 1 - Ativo, 0 - Inativo
++ imgPerfil: `images/124gydg7` (string) - URL da imagem de perfil do cliente
++ status: 1 (number) - Status do cliente. 1 - Ativo, 0 - Inativo
 
 ## Motoqueiro (object)
-+ _id (string) - ID do motoqueiro
-+ nome (string) - Nome do motoqueiro
-+ sobrenome (string) - Sobrenome do motoqueiro
-+ email (string) - Email do motoqueiro
-+ cnh1 (string) - URL da foto da CNH (frente)
-+ cnh2 (string) - URL da foto da CNH (verso)
-+ moto (string) - Modelo e cor do veículo do motoqueiro
-+ placa (string) - Placa do veículo do motoqueiro
++ _id: `5c7d3f` (string) - ID do motoqueiro
++ nome: `John` (string) - Nome do motoqueiro
++ sobrenome: `Doe` (string) - Sobrenome do motoqueiro
++ email: `email@email.com` (string) - Email do motoqueiro
++ cnh1: `images/123abc`  (string) - URL da foto da CNH (frente)
++ cnh2: `images/456def`  (string) - URL da foto da CNH (verso)
++ moto: `Titan 125 - Preta` (string) - Modelo e cor do veículo do motoqueiro
++ placa: `gvg1234` (string) - Placa do veículo do motoqueiro
 + corridas (array[Corrida]) - Corridas feitas pelo motoqueiro
 + avaliacoes (array[Avaliação]) - Avaliações do motoqueiro
-+ imgPerfil (string) - URL da imagem de perfil do motoqueiro
-+ status (number) - Status do motoqueiro. 1 - Ativo, 0 - Inativo
++ imgPerfil: `images/124gydg7` (string) - URL da imagem de perfil do motoqueiro
++ status: 2 (number) - Status do motoqueiro. 2 - Ativo, 1 - Em análise, 0 - Inativo
 
 ## Corrida (object)
 + origem (object, required) - Origem da corrida

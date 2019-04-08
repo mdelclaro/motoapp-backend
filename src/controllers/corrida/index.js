@@ -88,8 +88,7 @@ exports.createCorrida = async (req, res, next) => {
     //io.getIO().emit("corrida", { action: "create", corrida });
     res.status(201).json({
       message: "Corrida criada com sucesso!",
-      corrida,
-      cliente: { _id: cliente._id, nome: cliente.nome }
+      corrida
     });
     module.exports.handleDispatch(corrida, cliente);
   } catch (err) {
@@ -120,10 +119,16 @@ exports.updateCorrida = async (req, res, next) => {
       throw error;
     }
 
+    const idCliente = corrida.idCliente.toString();
+
+    if (idCliente !== userId) {
+      error = errorHandling.createError("Não autorizado", 403);
+      throw error;
+    }
+
     corrida.idMotoqueiro = idMotoqueiro ? idMotoqueiro : corrida.idMotoqueiro;
     corrida.status = status;
 
-    const idCliente = corrida.idCliente.toString();
     const result = await corrida.save();
 
     if (idMotoqueiro) {

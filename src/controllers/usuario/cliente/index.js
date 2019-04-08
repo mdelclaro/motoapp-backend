@@ -106,6 +106,11 @@ exports.updateCliente = async (req, res, next) => {
       throw error;
     }
 
+    if (idCliente !== req.userId) {
+      error = errorHandling.createError("Não autorizado", 403);
+      throw error;
+    }
+
     const cliente = await Cliente.findById(idCliente);
     if (!cliente) {
       error = errorHandling.createError("Cliente não encontrado.", 404);

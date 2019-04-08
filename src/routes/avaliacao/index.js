@@ -6,11 +6,11 @@ const auth = require("../../utils/auth/");
 
 const router = express.Router();
 
-// GET motoapp/v1/avaliacao/id
-router.get("/:idAvaliacao", auth, avaliacaoController.getAvaliacao);
-
 // GET motoapp/v1/avaliacao/
 router.get("/", auth, avaliacaoController.getAvaliacoes);
+
+// GET motoapp/v1/avaliacao/id
+router.get("/:idAvaliacao", auth, avaliacaoController.getAvaliacao);
 
 // POST motoapp/v1/avaliacao/
 router.post(
@@ -22,7 +22,8 @@ router.post(
       .isEmpty(),
     body("comentario")
       .trim()
-      .escape(),
+      .escape()
+      .optional(),
     body("idMotoqueiro")
       .not()
       .isEmpty()

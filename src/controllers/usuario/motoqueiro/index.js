@@ -108,6 +108,11 @@ exports.updateMotoqueiro = async (req, res, next) => {
       throw error;
     }
 
+    if (idMotoqueiro !== req.userId) {
+      error = errorHandling.createError("Não autorizado", 403);
+      throw error;
+    }
+
     const motoqueiro = await Motoqueiro.findById(idMotoqueiro);
     if (!motoqueiro) {
       error = errorHandling.createError("Motoqueiro não encontrado.", 404);

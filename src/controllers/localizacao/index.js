@@ -68,6 +68,11 @@ exports.createMotoqueiroLocation = async (req, res, next) => {
       throw error;
     }
 
+    if (idMotoqueiro !== req.userId) {
+      error = errorHandling.createError("Não autorizado", 403);
+      throw error;
+    }
+
     const motoqueiroLocation = await MotoqueiroLocation.findOne({
       idMotoqueiro
     });
@@ -92,7 +97,7 @@ exports.createMotoqueiroLocation = async (req, res, next) => {
       });
 
       res.status(200).json({
-        message: "Location atualizada",
+        message: "Localização atualizada",
         motoqueiroLocation: result
       });
     }
@@ -125,47 +130,47 @@ exports.createMotoqueiroLocation = async (req, res, next) => {
 };
 
 // Atualizar motoqueiro location
-exports.updateMotoqueiroLocation = async (req, res, next) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      error = errorHandling.createError("Validation Failed", 422);
-      throw error;
-    }
+// exports.updateMotoqueiroLocation = async (req, res, next) => {
+//   try {
+//     const errors = validationResult(req);
+//     if (!errors.isEmpty()) {
+//       error = errorHandling.createError("Validation Failed", 422);
+//       throw error;
+//     }
 
-    const location = req.body.location;
-    const idMotoqueiro = req.params.idMotoqueiro;
+//     const location = req.body.location;
+//     const idMotoqueiro = req.params.idMotoqueiro;
 
-    if (!ObjectId.isValid(idMotoqueiro)) {
-      error = errorHandling.createError("ID inválido", 422);
-      throw error;
-    }
+//     if (!ObjectId.isValid(idMotoqueiro)) {
+//       error = errorHandling.createError("ID inválido", 422);
+//       throw error;
+//     }
 
-    const motoqueiroLocation = await MotoqueiroLocation.findOne({
-      idMotoqueiro
-    });
-    if (!motoqueiroLocation) {
-      error = errorHandling.createError("Localização não encontrada", 404);
-      throw error;
-    }
+//     const motoqueiroLocation = await MotoqueiroLocation.findOne({
+//       idMotoqueiro
+//     });
+//     if (!motoqueiroLocation) {
+//       error = errorHandling.createError("Localização não encontrada", 404);
+//       throw error;
+//     }
 
-    motoqueiroLocation.location = location;
+//     motoqueiroLocation.location = location;
 
-    const result = await motoqueiroLocation.save();
+//     const result = await motoqueiroLocation.save();
 
-    let socket = io.getIO();
-    socket.sockets.in(idMotoqueiro).emit("locationChanged", {
-      coords: location
-      // duration: duration.duration.value
-    });
+//     let socket = io.getIO();
+//     socket.sockets.in(idMotoqueiro).emit("locationChanged", {
+//       coords: location
+//       // duration: duration.duration.value
+//     });
 
-    res
-      .status(200)
-      .json({ message: "Location atualizada", motoqueiroLocation: result });
-  } catch (err) {
-    if (!err.statusCode) {
-      err.statusCode = 500;
-    }
-    next(err);
-  }
-};
+//     res
+//       .status(200)
+//       .json({ message: "Location atualizada", motoqueiroLocation: result });
+//   } catch (err) {
+//     if (!err.statusCode) {
+//       err.statusCode = 500;
+//     }
+//     next(err);
+//   }
+// };
