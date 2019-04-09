@@ -19,8 +19,6 @@ const {
   authRoute
 } = require("./src/routes");
 
-const app = express();
-
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "images");
@@ -42,10 +40,9 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// Add cors headers
-app.use(cors());
+const app = express();
 
-// bodyParser dos requests
+app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
@@ -75,7 +72,7 @@ app.get("/images*", (req, res) => {
 app.use("/v1/corrida", corridaRoutes);
 app.use("/v1/usuario/cliente", clienteRoutes);
 app.use("/v1/usuario/motoqueiro", motoqueiroRoutes);
-app.use("/v1/localizacao", motoqueiroLocationRoutes);
+app.use("/v1/location", motoqueiroLocationRoutes);
 app.use("/v1/avaliacao", avaliacaoRoutes);
 app.use("/v1/auth", authRoute);
 

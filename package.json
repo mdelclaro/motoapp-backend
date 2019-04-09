@@ -2,10 +2,12 @@
   "name": "api-backend",
   "version": "1.0.0",
   "description": "Moto App Backend",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
-    "start": "nodemon --delay 2 app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon --delay 2 app.js",
+    "start": "node app.js",
+    "doc": "cd docs/ && aglio -i api.apib --theme-variables slate --theme-full-width -o api.html",
+    "test": "mocha"
   },
   "author": "Matheus Del Claro",
   "license": "ISC",
@@ -25,6 +27,8 @@
     "socket.io": "^2.2.0"
   },
   "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^6.1.2",
     "nodemon": "^1.18.10"
   }
 }

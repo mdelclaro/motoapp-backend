@@ -563,7 +563,7 @@ Deletar corrida
 
 # Group Localização
 
-## Localizações [/localizacao/]
+## Localizações [/location/]
 
 ### Buscar Localizações [GET]
 Listar localizações
@@ -575,7 +575,7 @@ Listar localizações
             Authorization: Bearer token
 
 + Response 200 (application/json)
-    + Attributes (array[Localização])
+    + Attributes (array[Location])
 
 + Response 401 (application/json)
     + Attributes (Error_401)
@@ -604,7 +604,7 @@ Criar Localização, ou atualizar
 + Response 200 (application/json)
     + Attributes (object)
         + message: `Localização atualizada/criada com sucesso!` (string)
-        + motoqueiroLocation (Localização)
+        + motoqueiroLocation (Location)
 
 + Response 401 (application/json)
     + Attributes (Error_401)
@@ -617,7 +617,7 @@ Criar Localização, ou atualizar
 
 + Response 500 (application/json)
 
-## Localização [/localizacao/{idMotoqueiro}]
+## Localização [/location/{idMotoqueiro}]
 
 + Parameters
     + idMotoqueiro: `5c9528711` (string, required) - ID do motoqueiro
@@ -632,7 +632,7 @@ Listar localização
             Authorization: Bearer token
 
 + Response 200 (application/json)
-    + Attributes (Localização)
+    + Attributes (Location)
 
 + Response 401 (application/json)
     + Attributes (Error_401)
@@ -771,7 +771,7 @@ Listar avaliação
     3 - Corrida Finalizada
     4 - Corrida Cancelada
 
-## Localização (object)
+## Location (object)
 + idMotoqueiro: `9ca32a` (string) - ID do motoqueiro
 + location - Localização do motoqueiro
     + lat: `-23.7851587` (string)

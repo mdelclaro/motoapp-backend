@@ -1,7 +1,7 @@
 const express = require("express");
 const { body } = require("express-validator/check");
 
-const locationController = require("../controllers/localizacao");
+const locationController = require("../controllers/location");
 const auth = require("../middlewares/auth");
 
 const router = express.Router();
