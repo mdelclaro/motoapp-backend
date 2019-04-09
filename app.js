@@ -7,15 +7,17 @@ const path = require("path");
 const uuidv4 = require("uuid/v4");
 require("dotenv").config();
 
-const { mongoPwd } = require("./src/config");
+const { mongodbUrl } = require("./src/utils/config");
 
 // Rotas
-const corridaRoutes = require("./src/routes/corrida/");
-const clienteRoutes = require("./src/routes/usuario/cliente/");
-const motoqueiroRoutes = require("./src/routes/usuario/motoqueiro/");
-const motoqueiroLocationRoutes = require("./src/routes/location/");
-const avaliacaoRoutes = require("./src/routes/avaliacao/");
-const authRoute = require("./src/routes/auth/");
+const {
+  corridaRoutes,
+  clienteRoutes,
+  motoqueiroRoutes,
+  motoqueiroLocationRoutes,
+  avaliacaoRoutes,
+  authRoute
+} = require("./src/routes");
 
 const app = express();
 
@@ -91,13 +93,10 @@ app.use((req, res) => {
 
 // mongoDB && init server
 mongoose
-  .connect(
-    `mongodb+srv://mdelclaro:${mongoPwd}@cluster0-jjfdi.mongodb.net/motoapp?retryWrites=true`,
-    { useNewUrlParser: true }
-  )
+  .connect(mongodbUrl, { useNewUrlParser: true })
   .then(() => {
     const server = app.listen(8080);
-    const io = require("./src/utils/socket/").init(server);
+    const io = require("./src/utils/socket").init(server);
 
     //clientes
     io.sockets.on("connection", socket => {
