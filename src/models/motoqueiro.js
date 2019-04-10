@@ -45,12 +45,13 @@ const motoqueiroSchema = new Schema(
     avaliacoes: [
       {
         type: Schema.Types.ObjectId,
-        ref: "Avaliacao"
+        ref: "Avaliacao",
+        required: false
       }
     ],
     imgPerfil: {
       type: String,
-      require: false
+      required: false
     },
     status: {
       type: Number,
