@@ -35,6 +35,9 @@ Fazer login do cliente (gerar JWT)
     + Attributes (object)
         + statusCode: 401 (number)
         + message: `Senha inválida` (string)
+        
++ Response 422 (application/json)
+    + Attributes (Error_422)
 
 + Response 500 (application/json)
 
@@ -58,6 +61,9 @@ Atualizar JWT
     + Attributes (object)
         + statusCode: 401 (number)
         + message: `E-mail não cadastrado` (string)
+
++ Response 422 (application/json)
+    + Attributes (Error_422)
 
 + Response 500 (application/json)
     + Attributes (object)
@@ -89,6 +95,9 @@ Fazer login do motoqueiro (gerar JWT)
         + statusCode: 401 (number)
         + message: `Senha inválida` (string)
 
++ Response 422 (application/json)
+    + Attributes (Error_422)
+
 + Response 500 (application/json)
 
 ## Refresh Token Motoqueiro [/auth/motoqueiro/refreshToken/]
@@ -112,6 +121,9 @@ Atualizar JWT
     + Attributes (object)
         + statusCode: 401 (number)
         + message: `E-mail não cadastrado` (string)
+
++ Response 422 (application/json)
+    + Attributes (Error_422)
 
 + Response 500 (application/json)
     + Attributes (object)

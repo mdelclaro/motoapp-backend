@@ -12,6 +12,12 @@ const { errorHandling } = require("../utils");
 
 exports.login = async (req, res, next) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      error.errorHandler.createError("Validation failed", 422, errors);
+      throw error;
+    }
+
     const email = req.body.email;
     const senha = req.body.senha;
     const cliente = await Cliente.findOne({ email }).select("+senha");
@@ -63,6 +69,12 @@ exports.login = async (req, res, next) => {
 
 exports.refreshToken = async (req, res, next) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      error.errorHandler.createError("Validation failed", 422, errors);
+      throw error;
+    }
+
     const refreshToken = req.body.refreshToken;
     let decodedToken;
 
