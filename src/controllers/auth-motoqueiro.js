@@ -1,6 +1,5 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { validationResult } = require("express-validator/check");
 
 const {
   privateKey,
@@ -13,12 +12,6 @@ const { errorHandling } = require("../utils");
 
 exports.login = async (req, res, next) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      error.errorHandling.createError("Validation failed", 422, errors);
-      throw error;
-    }
-
     const email = req.body.email;
     const senha = req.body.senha;
     const motoqueiro = await Motoqueiro.findOne({ email }).select("+senha");
@@ -32,7 +25,7 @@ exports.login = async (req, res, next) => {
       const error = errorHandling.createError("Senha inválida", 401);
       throw error;
     }
-    const token = jwt.sign(
+    const token = await jwt.sign(
       {
         email: motoqueiro.email,
         userId: motoqueiro._id.toString()
@@ -40,7 +33,7 @@ exports.login = async (req, res, next) => {
       privateKey,
       { expiresIn: "1h", algorithm: "RS256" }
     );
-    const refreshToken = jwt.sign(
+    const refreshToken = await jwt.sign(
       {
         email: motoqueiro.email,
         userId: motoqueiro._id.toString()
@@ -59,11 +52,13 @@ exports.login = async (req, res, next) => {
       accountStatus: motoqueiro.status,
       imgPerfil: motoqueiro.imgPerfil
     });
+    return;
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
     }
     next(err);
+    return err;
   }
 };
 
@@ -73,7 +68,8 @@ exports.refreshToken = async (req, res, next) => {
     let decodedToken;
 
     try {
-      decodedToken = jwt.verify(refreshToken, refreshTokenPublicKey);
+      decodedToken = await jwt.verify(refreshToken, refreshTokenPublicKey);
+      if (!decodedToken) throw new Error();
     } catch (err) {
       err.message = "Token inválido";
       err.statusCode = 500;
@@ -86,7 +82,7 @@ exports.refreshToken = async (req, res, next) => {
       throw error;
     }
 
-    const token = jwt.sign(
+    const token = await jwt.sign(
       {
         email: motoqueiro.email,
         userId: motoqueiro._id.toString()
@@ -103,10 +99,12 @@ exports.refreshToken = async (req, res, next) => {
       expiryDate: expiryDate.toString(),
       accountStatus: motoqueiro.status
     });
+    return;
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
     }
     next(err);
+    return err;
   }
 };

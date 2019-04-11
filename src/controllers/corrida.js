@@ -312,6 +312,7 @@ async function handleDispatch(corrida, cliente) {
           continue;
         }
       }
+      // caso não haja nenhum motoqueiro disponível, cancelar a corrida
       if (!accepted) {
         socket.sockets.in(corrida.idCliente).emit("cancelCorrida");
         return;

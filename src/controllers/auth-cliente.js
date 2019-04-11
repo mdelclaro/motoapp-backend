@@ -14,8 +14,8 @@ exports.login = async (req, res, next) => {
   try {
     const email = req.body.email;
     const senha = req.body.senha;
+    const cliente = await Cliente.findOne({ email }).select("+senha");
 
-    const cliente = await Cliente.findOne({ email });
     if (!cliente) {
       const error = errorHandling.createError("E-mail não cadastrado", 401);
       throw error;
@@ -25,7 +25,7 @@ exports.login = async (req, res, next) => {
       const error = errorHandling.createError("Senha inválida", 401);
       throw error;
     }
-    const token = jwt.sign(
+    const token = await jwt.sign(
       {
         email: cliente.email,
         userId: cliente._id.toString()
@@ -33,7 +33,7 @@ exports.login = async (req, res, next) => {
       privateKey,
       { expiresIn: "1h", algorithm: "RS256" }
     );
-    const refreshToken = jwt.sign(
+    const refreshToken = await jwt.sign(
       {
         email: cliente.email,
         userId: cliente._id.toString()
@@ -51,11 +51,13 @@ exports.login = async (req, res, next) => {
       userId: cliente._id.toString(),
       imgPerfil: cliente.imgPerfil
     });
+    return;
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
     }
     next(err);
+    return err;
   }
 };
 
@@ -65,7 +67,8 @@ exports.refreshToken = async (req, res, next) => {
     let decodedToken;
 
     try {
-      decodedToken = jwt.verify(refreshToken, refreshTokenPublicKey);
+      decodedToken = await jwt.verify(refreshToken, refreshTokenPublicKey);
+      if (!decodedToken) throw new Error();
     } catch (err) {
       err.message = "Token inválido";
       err.statusCode = 500;
@@ -78,7 +81,7 @@ exports.refreshToken = async (req, res, next) => {
       throw error;
     }
 
-    const token = jwt.sign(
+    const token = await jwt.sign(
       {
         email: cliente.email,
         userId: cliente._id.toString()
@@ -94,10 +97,12 @@ exports.refreshToken = async (req, res, next) => {
       userId: cliente._id.toString(),
       expiryDate: expiryDate.toString()
     });
+    return;
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
     }
     next(err);
+    return err;
   }
 };
