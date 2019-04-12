@@ -16,7 +16,9 @@ const {
   motoqueiroRoutes,
   motoqueiroLocationRoutes,
   avaliacaoRoutes,
-  authRoute
+  authRoute,
+  chatRoute,
+  mensagemRoute
 } = require("./src/routes");
 
 const storage = multer.diskStorage({
@@ -75,6 +77,8 @@ app.use("/v1/usuario/motoqueiro", motoqueiroRoutes);
 app.use("/v1/location", motoqueiroLocationRoutes);
 app.use("/v1/avaliacao", avaliacaoRoutes);
 app.use("/v1/auth", authRoute);
+app.use("/v1/chat", chatRoute);
+app.use("/v1/mensagem", mensagemRoute);
 
 // tratamento de erros
 app.use((error, req, res, next) => {

@@ -3,5 +3,7 @@ module.exports = {
   Cliente: require("./cliente"),
   Corrida: require("./corrida"),
   Location: require("./location"),
-  Motoqueiro: require("./motoqueiro")
+  Motoqueiro: require("./motoqueiro"),
+  Chat: require("./chat"),
+  Mensagem: require("./mensagem")
 };

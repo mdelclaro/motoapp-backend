@@ -4,5 +4,7 @@ module.exports = {
   motoqueiroRoutes: require("./motoqueiro"),
   motoqueiroLocationRoutes: require("./location"),
   avaliacaoRoutes: require("./avaliacao"),
-  authRoute: require("./auth")
+  authRoute: require("./auth"),
+  chatRoute: require("./chat"),
+  mensagemRoute: require("./mensagem")
 };

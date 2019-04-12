@@ -22,6 +22,7 @@ const avaliacaoSchema = new Schema(
       required: true
     }
   },
+  { collection: "avaliacao" },
   { timestamps: true }
 );
 

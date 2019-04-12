@@ -13,6 +13,7 @@ const locationSchema = new Schema(
       required: true
     }
   },
+  { collection: "location" },
   { timestamps: true }
 );
 
