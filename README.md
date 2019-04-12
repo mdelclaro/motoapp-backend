@@ -2,7 +2,7 @@
 
 Back-end application to serve the mobile apps
 
-* [Rider's app](https://github.com/mdelclaro/motoappdriver-mobile)
+* [Driver's app](https://github.com/mdelclaro/motoappdriver-mobile)
 * [Client's app](https://github.com/mdelclaro/motoapp-mobile)
 
 ### Running:
