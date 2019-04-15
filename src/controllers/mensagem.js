@@ -13,9 +13,10 @@ exports.createMensagem = async (req, res, next) => {
       throw error;
     }
 
-    const msg = req.body.mensagem;
+    const text = req.body.text;
     const idMotoqueiro = req.body.idMotoqueiro;
     const idCliente = req.body.idCliente;
+    const sender = req.body.sender;
 
     if (!ObjectId.isValid(idMotoqueiro) || !ObjectId.isValid(idCliente)) {
       error = errorHandling.createError("ID inválido", 422);
@@ -33,10 +34,10 @@ exports.createMensagem = async (req, res, next) => {
     }
 
     const mensagem = new Mensagem({
-      mensagem: msg,
-      idMotoqueiro,
-      idCliente,
-      chat: chat._id
+      text,
+      sender,
+      chat: chat._id,
+      sent: true
     });
 
     await mensagem.save();
@@ -45,7 +46,7 @@ exports.createMensagem = async (req, res, next) => {
 
     res.status(201).json({
       message: "Mensagem criada com sucesso!",
-      chat
+      mensagem
     });
   } catch (err) {
     if (!err.statusCode) {

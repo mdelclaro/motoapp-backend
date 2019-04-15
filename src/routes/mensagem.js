@@ -10,7 +10,11 @@ const router = express.Router();
 router.post(
   "/",
   [
-    body("mensagem")
+    body("sender")
+      .trim()
+      .not()
+      .isEmpty(),
+    body("text")
       .trim()
       .not()
       .isEmpty(),

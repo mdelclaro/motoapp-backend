@@ -22,8 +22,7 @@ const avaliacaoSchema = new Schema(
       required: true
     }
   },
-  { collection: "avaliacao" },
-  { timestamps: true }
+  { collection: "avaliacao", timestamps: true }
 );
 
 module.exports = mongoose.model("Avaliacao", avaliacaoSchema);

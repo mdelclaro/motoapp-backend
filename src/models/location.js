@@ -13,8 +13,7 @@ const locationSchema = new Schema(
       required: true
     }
   },
-  { collection: "location" },
-  { timestamps: true }
+  { collection: "location", timestamps: true }
 );
 
 module.exports = mongoose.model("Location", locationSchema);

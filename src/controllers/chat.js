@@ -31,7 +31,8 @@ exports.getChatCliente = async (req, res, next) => {
     }
     const chat = await Chat.find({ idCliente })
       .populate("mensagens")
-      .populate("idMotoqueiro", "nome");
+      .populate("idMotoqueiro", ["nome", "imgPerfil"])
+      .select("+createdAt");
     if (!chat) {
       error = errorHandling.createError("Nenhum chat encontrado.", 404);
       throw error;
@@ -55,8 +56,9 @@ exports.getChatMotoqueiro = async (req, res, next) => {
       throw error;
     }
     const chat = await Chat.find({ idMotoqueiro })
-      .populate("mensagens")
-      .populate("idCliente", "nome");
+      .populate("mensagens", "createdAt")
+      .populate("idCliente", ["nome", "imgPerfil"])
+      .select("+createdAt");
     if (!chat) {
       error = errorHandling.createError("Nenhum chat encontrado.", 404);
       throw error;

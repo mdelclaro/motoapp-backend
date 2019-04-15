@@ -1,5 +1,6 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { validationResult } = require("express-validator/check");
 
 const {
   privateKey,
@@ -12,6 +13,12 @@ const { errorHandling } = require("../utils");
 
 exports.login = async (req, res, next) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const error = errorHandling.createError("Validation failed", 422, errors);
+      throw error;
+    }
+
     const email = req.body.email;
     const senha = req.body.senha;
     const motoqueiro = await Motoqueiro.findOne({ email }).select("+senha");
@@ -64,6 +71,12 @@ exports.login = async (req, res, next) => {
 
 exports.refreshToken = async (req, res, next) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const error = errorHandling.createError("Validation failed", 422, errors);
+      throw error;
+    }
+
     const refreshToken = req.body.refreshToken;
     let decodedToken;
 

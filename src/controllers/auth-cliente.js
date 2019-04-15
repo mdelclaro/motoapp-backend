@@ -1,5 +1,6 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { validationResult } = require("express-validator/check");
 
 const {
   privateKey,
@@ -14,7 +15,7 @@ exports.login = async (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      error.errorHandler.createError("Validation failed", 422, errors);
+      const error = errorHandling.createError("Validation failed", 422, errors);
       throw error;
     }
 
@@ -71,7 +72,7 @@ exports.refreshToken = async (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      error.errorHandler.createError("Validation failed", 422, errors);
+      const error = errorHandling.createError("Validation failed", 422, errors);
       throw error;
     }
 

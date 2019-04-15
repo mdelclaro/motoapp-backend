@@ -3,28 +3,25 @@ const Schema = mongoose.Schema;
 
 const mensagemSchema = new mongoose.Schema(
   {
-    mensagem: {
+    text: {
       type: String,
       required: true
     },
-    idMotoqueiro: {
+    sender: {
       type: Schema.Types.ObjectId,
-      required: true,
-      ref: "Motoqueiro"
-    },
-    idCliente: {
-      type: Schema.Types.ObjectId,
-      required: true,
-      ref: "Cliente"
+      required: true
     },
     chat: {
       type: Schema.Types.ObjectId,
       ref: "Chat",
       required: true
+    },
+    sent: {
+      type: Boolean,
+      required: true
     }
   },
-  { collection: "mensagens" },
-  { timestamps: true }
+  { collection: "mensagens", timestamps: true }
 );
 
 module.exports = mongoose.model("Mensagem", mensagemSchema);

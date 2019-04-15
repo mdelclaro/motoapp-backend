@@ -9,7 +9,7 @@ const router = express.Router();
 router.post(
   "/cliente/",
   [
-    body("username")
+    body("email")
       .not()
       .isEmpty(),
     body("senha")
@@ -30,7 +30,7 @@ router.post(
 router.post(
   "/motoqueiro/",
   [
-    body("username")
+    body("email")
       .not()
       .isEmpty(),
     body("senha")
