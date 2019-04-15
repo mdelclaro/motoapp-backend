@@ -6,16 +6,12 @@ const chatController = require("../controllers/chat");
 const router = express.Router();
 
 // GET /v1/chat/
-router.get("/", () => {}, chatController.getChats);
+router.get("/", chatController.getChats);
 
 // GET /v1/chat/cliente/:idCliente
-router.get("/cliente/:idCliente", () => {}, chatController.getChatCliente);
+router.get("/cliente/:idCliente", chatController.getChatCliente);
 
 // GET /v1/chat/motoqueiro/:idMotoqueiro
-router.get(
-  "/motoqueiro/:idMotoqueiro",
-  () => {},
-  chatController.getChatMotoqueiro
-);
+router.get("/motoqueiro/:idMotoqueiro", chatController.getChatMotoqueiro);
 
 module.exports = router;

@@ -29,7 +29,9 @@ exports.getChatCliente = async (req, res, next) => {
       error = errorHandling.createError("ID inválido", 422);
       throw error;
     }
-    const chat = await Chat.findOne({ idCliente }).populate("mensagens");
+    const chat = await Chat.find({ idCliente })
+      .populate("mensagens")
+      .populate("idMotoqueiro", "nome");
     if (!chat) {
       error = errorHandling.createError("Nenhum chat encontrado.", 404);
       throw error;
@@ -52,7 +54,9 @@ exports.getChatMotoqueiro = async (req, res, next) => {
       error = errorHandling.createError("ID inválido", 422);
       throw error;
     }
-    const chat = await Chat.findOne({ idMotoqueiro }).populate("mensagens");
+    const chat = await Chat.find({ idMotoqueiro })
+      .populate("mensagens")
+      .populate("idCliente", "nome");
     if (!chat) {
       error = errorHandling.createError("Nenhum chat encontrado.", 404);
       throw error;

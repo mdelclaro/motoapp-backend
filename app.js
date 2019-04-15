@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const multer = require("multer");
 const path = require("path");
 const uuidv4 = require("uuid/v4");
+const morgan = require("morgan");
 require("dotenv").config();
 
 const { mongodbUrl } = require("./src/utils/config");
@@ -44,6 +45,7 @@ const fileFilter = (req, file, cb) => {
 
 const app = express();
 
+app.use(morgan("combined"));
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());

@@ -218,7 +218,7 @@ exports.deleteCorrida = async (req, res, next) => {
       throw error;
     }
     if (!corrida.idMotoqueiro) {
-      await Corrida.findByIdAndRemove(idCorrida);
+      await Corrida.findOneAndDelete(idCorrida);
       const cliente = await Cliente.findById(req.userId);
       cliente.corridas.pull(idCorrida);
       await cliente.save();

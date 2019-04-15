@@ -86,8 +86,7 @@ exports.createLocation = async (req, res, next) => {
         location: result
       });
     } else {
-      location.location = motoqueiroLocation;
-
+      location.set(req.body);
       const result = await location.save();
 
       socket.sockets.in(idMotoqueiro).emit("locationChanged", {
