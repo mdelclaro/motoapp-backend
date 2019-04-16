@@ -32,7 +32,10 @@ exports.getCliente = async (req, res, next) => {
       error = errorHandling.createError("ID invalido.", 422);
       throw error;
     }
-    const cliente = await Cliente.findById(idCliente);
+    const cliente = await Cliente.findById(idCliente).populate({
+      path: "corridas",
+      populate: { path: "idMotoqueiro", select: ["nome", "sobrenome"] }
+    });
     if (!cliente) {
       error = errorHandling.createError("Nenhum cliente encontrado.", 404);
       throw error;

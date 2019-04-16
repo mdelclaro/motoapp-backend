@@ -27,7 +27,7 @@ router.post(
       .not()
       .isEmpty()
   ],
-  // auth,
+  auth,
   mensagemController.createMensagem
 );
 
