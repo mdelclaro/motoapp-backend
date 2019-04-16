@@ -24,20 +24,33 @@ exports.getChats = async (req, res, next) => {
 exports.getChatCliente = async (req, res, next) => {
   try {
     const idCliente = req.params.idCliente;
+    const page = parseInt(req.query.page);
 
     if (!ObjectId.isValid(idCliente)) {
       error = errorHandling.createError("ID inválido", 422);
       throw error;
     }
-    const chat = await Chat.find({ idCliente })
-      .populate("mensagens")
+    let chat = await Chat.find({ idCliente });
+    let count = [];
+    chat.forEach((c, index) => {
+      count.push(c.mensagens.length);
+    });
+    chat = await Chat.find({ idCliente })
+      .populate({
+        path: "mensagens",
+        options: {
+          limit: 5,
+          skip: page * 5,
+          sort: { createdAt: -1 }
+        }
+      })
       .populate("idMotoqueiro", ["nome", "imgPerfil"])
       .select("+createdAt");
     if (!chat) {
       error = errorHandling.createError("Nenhum chat encontrado.", 404);
       throw error;
     }
-    res.status(200).json({ message: "Sucesso", chat });
+    res.status(200).json({ message: "Sucesso", chat, count });
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;

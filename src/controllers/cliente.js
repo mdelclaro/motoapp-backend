@@ -152,13 +152,7 @@ exports.updateCliente = async (req, res, next) => {
     const result = await cliente.save();
     res.status(200).json({
       message: "Cliente atualizado",
-      cliente: {
-        _id: result._id,
-        nome: result.nome,
-        sobrenome: result.sobrenome,
-        email: result.email,
-        status: result.status
-      }
+      cliente: result
     });
   } catch (err) {
     if (!err.statusCode) {
