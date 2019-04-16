@@ -3,7 +3,7 @@ const { validationResult } = require("express-validator/check");
 const ObjectId = require("mongoose").Types.ObjectId;
 
 const { Chat, Mensagem } = require("../models");
-const { errorHandling } = require("../utils");
+const { errorHandling, io } = require("../utils");
 
 exports.createMensagem = async (req, res, next) => {
   try {
@@ -48,6 +48,18 @@ exports.createMensagem = async (req, res, next) => {
       message: "Mensagem criada com sucesso!",
       mensagem
     });
+
+    let socket = io.getIO();
+
+    if (sender === idMotoqueiro) {
+      socket.sockets.in(idCliente).emit("msgFromDriver", {
+        mensagem
+      });
+    } else {
+      socket.sockets.in(idMotoqueiro).emit("msgFromRider", {
+        mensagem
+      });
+    }
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
