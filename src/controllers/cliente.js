@@ -34,6 +34,7 @@ exports.getCliente = async (req, res, next) => {
     }
     const cliente = await Cliente.findById(idCliente).populate({
       path: "corridas",
+      match: { status: [3, 4] },
       populate: { path: "idMotoqueiro", select: ["nome", "sobrenome"] }
     });
     if (!cliente) {
