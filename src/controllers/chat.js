@@ -73,7 +73,7 @@ exports.getChatMotoqueiro = async (req, res, next) => {
       throw error;
     }
 
-    let chat = await Chat.find({ idCliente });
+    let chat = await Chat.find({ idMotoqueiro });
     let count = [];
     chat.forEach((c, index) => {
       count.push(c.mensagens.length);

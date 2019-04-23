@@ -32,7 +32,11 @@ exports.getMotoqueiro = async (req, res, next) => {
       error = errorHandling.createError("ID inválido.", 422);
       throw error;
     }
-    const motoqueiro = await Motoqueiro.findById(idMotoqueiro);
+    const motoqueiro = await Motoqueiro.findById(idMotoqueiro).populate({
+      path: "corridas",
+      match: { status: [3, 4] },
+      populate: { path: "idCliente", select: ["nome", "sobrenome"] }
+    });
     if (!motoqueiro) {
       error = errorHandling.createError("Nenhum motoqueiro encontrado.", 404);
       throw error;

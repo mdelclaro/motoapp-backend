@@ -56,9 +56,12 @@ exports.createMensagem = async (req, res, next) => {
         mensagem
       });
     } else {
-      socket.sockets.in(idMotoqueiro).emit("msgFromRider", {
-        mensagem
-      });
+      socket
+        .of("/drivers")
+        .in(idMotoqueiro)
+        .emit("msgFromRider", {
+          mensagem
+        });
     }
   } catch (err) {
     if (!err.statusCode) {
