@@ -7,11 +7,11 @@ const auth = require("../middlewares/auth");
 
 const router = express.Router();
 
-// GET motoapp/v1/usuario/motoqueiro/id
-router.get("/:idMotoqueiro", auth, motoqueiroController.getMotoqueiro);
-
 // GET motoapp/v1/usuario/motoqueiro/
 router.get("/", auth, motoqueiroController.getMotoqueiros);
+
+// GET motoapp/v1/usuario/motoqueiro/id
+router.get("/:idMotoqueiro", auth, motoqueiroController.getMotoqueiro);
 
 // POST motoapp/v1/usuario/motoqueiro/
 router.post(

@@ -55,9 +55,7 @@ exports.login = async (req, res, next) => {
       token,
       refreshToken,
       expiryDate: expiryDate.toString(),
-      userId: motoqueiro._id.toString(),
-      accountStatus: motoqueiro.status,
-      imgPerfil: motoqueiro.imgPerfil
+      userId: motoqueiro._id.toString()
     });
     return;
   } catch (err) {
@@ -109,8 +107,7 @@ exports.refreshToken = async (req, res, next) => {
     res.status(200).json({
       token,
       userId: motoqueiro._id.toString(),
-      expiryDate: expiryDate.toString(),
-      accountStatus: motoqueiro.status
+      expiryDate: expiryDate.toString()
     });
     return;
   } catch (err) {
