@@ -66,6 +66,17 @@ exports.createCorrida = async (req, res, next) => {
     const idCliente = req.body.idCliente;
     const status = 0;
 
+    //calcular valor
+    let valor;
+    if (tempo < 7) {
+      valor = 5;
+    } else if (tempo > 7 && tempo < 13) {
+      valor = 6;
+    } else if (tempo > 13 && tempo < 18) {
+      valor = 7;
+    } else if (tempo > 18) {
+    }
+
     const corrida = new Corrida({
       origem,
       destino,
