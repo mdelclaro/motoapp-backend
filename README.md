@@ -7,8 +7,9 @@ Back-end application to serve the mobile apps
 
 ### Running:
 ``` 
-$ npm install 
+$ npm install
 $ npm start
+$ npm run dev # runs in development mode with Nodemon
 ```
 ### Testing:
 ```
@@ -19,7 +20,7 @@ $ npm test
 ```
 .
 ├── docs/                       # API docs
-├── images/                     # images folder
+├── images/                     # Images folder
 ├── src/                        # Source code
 │   ├── controllers/            # API controllers
 │   │   └── ...    
