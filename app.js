@@ -97,7 +97,8 @@ app.use((req, res) => {
 mongoose
   .connect(mongodbUrl, { useNewUrlParser: true })
   .then(() => {
-    const server = app.listen(8080);
+    const port = process.env.PORT || 8080;
+    const server = app.listen(port);
     const io = require('./src/utils/socket').init(server);
 
     //clientes
