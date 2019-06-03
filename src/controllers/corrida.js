@@ -1,20 +1,20 @@
-const { validationResult } = require("express-validator/check");
-const ObjectId = require("mongoose").Types.ObjectId;
-const geolib = require("geolib");
-const quickSort = require("@charlesstover/quicksort").default;
+const { validationResult } = require('express-validator/check');
+const ObjectId = require('mongoose').Types.ObjectId;
+const geolib = require('geolib');
+const quickSort = require('@charlesstover/quicksort').default;
 
-const { io, mapsClient, errorHandling } = require("../utils");
-const { Corrida, Cliente, Motoqueiro, Location } = require("../models/");
+const { io, mapsClient, errorHandling } = require('../utils');
+const { Corrida, Cliente, Motoqueiro, Location } = require('../models/');
 
 // Buscar Corridas
 exports.getCorridas = async (req, res, next) => {
   try {
     const corridas = await Corrida.find();
     if (!corridas) {
-      error = errorHandling.createError("Nenhuma corrida encontrada.", 404);
+      error = errorHandling.createError('Nenhuma corrida encontrada.', 404);
       throw error;
     }
-    res.status(200).json({ message: "Sucesso", corridas });
+    res.status(200).json({ message: 'Sucesso', corridas });
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
@@ -29,15 +29,15 @@ exports.getCorrida = async (req, res, next) => {
     const idCorrida = req.params.idCorrida;
 
     if (!ObjectId.isValid(idCorrida)) {
-      error = errorHandling.createError("ID inválido", 422);
+      error = errorHandling.createError('ID inválido', 422);
       throw error;
     }
     const corrida = await Corrida.findById(idCorrida);
     if (!corrida) {
-      error = errorHandling.createError("Nenhuma corrida encontrada.", 404);
+      error = errorHandling.createError('Nenhuma corrida encontrada.', 404);
       throw error;
     }
-    res.status(200).json({ message: "Sucesso", corrida });
+    res.status(200).json({ message: 'Sucesso', corrida });
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
@@ -52,7 +52,7 @@ exports.createCorrida = async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       error = errorHandling.createError(
-        "Validation Failed (createCorrida)",
+        'Validation Failed (createCorrida)',
         422
       );
       throw error;
@@ -62,8 +62,8 @@ exports.createCorrida = async (req, res, next) => {
     const destino = req.body.destino;
     const distancia = req.body.distancia;
     const tempo = req.body.tempo;
-    // const idCliente = req.userId;
-    const idCliente = req.body.idCliente;
+    const idCliente = req.userId;
+    // const idCliente = req.body.idCliente;
     const status = 0;
 
     //calcular valor
@@ -91,7 +91,7 @@ exports.createCorrida = async (req, res, next) => {
     await cliente.save();
 
     res.status(201).json({
-      message: "Corrida criada com sucesso!",
+      message: 'Corrida criada com sucesso!',
       corrida
     });
     handleDispatch(corrida, cliente);
@@ -108,7 +108,7 @@ exports.updateCorrida = async (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      error = errorHandling.createError("Validation Failed", 422);
+      error = errorHandling.createError('Validation Failed', 422);
       throw error;
     }
 
@@ -119,7 +119,7 @@ exports.updateCorrida = async (req, res, next) => {
 
     const corrida = await Corrida.findById(idCorrida);
     if (!corrida) {
-      error = errorHandling.createError("Corrida não encontrada", 404);
+      error = errorHandling.createError('Corrida não encontrada', 404);
       throw error;
     }
 
@@ -138,7 +138,7 @@ exports.updateCorrida = async (req, res, next) => {
     if (idMotoqueiro) {
       const motoqueiro = await Motoqueiro.findById(idMotoqueiro);
       if (!motoqueiro) {
-        error = errorHandling.createError("Id motoqueiro inválido.", 404);
+        error = errorHandling.createError('Id motoqueiro inválido.', 404);
         throw error;
       }
 
@@ -149,7 +149,7 @@ exports.updateCorrida = async (req, res, next) => {
       const location = await Location.findOne({ idMotoqueiro });
       if (!location) {
         error = errorHandling.createError(
-          "Localização do motoqueiro não encontrada.",
+          'Localização do motoqueiro não encontrada.',
           404
         );
         throw error;
@@ -166,11 +166,11 @@ exports.updateCorrida = async (req, res, next) => {
       };
       const duration = await mapsClient.getDistanceTime(origin, destination);
       if (!duration) {
-        error = errorHandling.createError("Erro ao calcular duração", 422);
+        error = errorHandling.createError('Erro ao calcular duração', 422);
         throw error;
       }
       let socket = io.getIO();
-      socket.sockets.in(idCliente).emit("acceptCorrida", {
+      socket.sockets.in(idCliente).emit('acceptCorrida', {
         motoqueiro,
         coords: location.location,
         duration: duration.duration.value
@@ -180,24 +180,24 @@ exports.updateCorrida = async (req, res, next) => {
     // motoqueiro chegou, iniciar viagem
     if (status == 2) {
       if (userId !== corrida.idMotoqueiro.toString()) {
-        error = errorHandling.createError("ACL error", 401);
+        error = errorHandling.createError('ACL error', 401);
         throw error;
       }
       let socket = io.getIO();
-      socket.sockets.in(idCliente).emit("startCorrida");
+      socket.sockets.in(idCliente).emit('startCorrida');
     }
 
     // fim da corrida
     if (status == 3) {
       if (userId !== corrida.idMotoqueiro.toString()) {
-        error = errorHandling.createError("ACL error", 401);
+        error = errorHandling.createError('ACL error', 401);
         throw error;
       }
       let socket = io.getIO();
-      socket.sockets.in(idCliente).emit("finishCorrida");
+      socket.sockets.in(idCliente).emit('finishCorrida');
     }
 
-    res.status(200).json({ message: "Corrida atualizada", corrida: result });
+    res.status(200).json({ message: 'Corrida atualizada', corrida: result });
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
@@ -211,21 +211,21 @@ exports.deleteCorrida = async (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      error = errorHandling.createError("Validation Failed", 422);
+      error = errorHandling.createError('Validation Failed', 422);
       throw error;
     }
     const idCorrida = req.params.idCorrida;
     if (!ObjectId.isValid(idCorrida)) {
-      error = errorHandling.createError("ID inválido.", 422);
+      error = errorHandling.createError('ID inválido.', 422);
       throw error;
     }
     const corrida = await Corrida.findById(idCorrida);
     if (!corrida) {
-      error = errorHandling.createError("Nenhuma corrida encontrada", 404);
+      error = errorHandling.createError('Nenhuma corrida encontrada', 404);
       throw error;
     }
     if (corrida.idCliente.toString() !== req.userId) {
-      error = errorHandling.createError("Não autorizado", 403);
+      error = errorHandling.createError('Não autorizado', 403);
       throw error;
     }
     if (!corrida.idMotoqueiro) {
@@ -233,9 +233,9 @@ exports.deleteCorrida = async (req, res, next) => {
       const cliente = await Cliente.findById(req.userId);
       cliente.corridas.pull(idCorrida);
       await cliente.save();
-      res.status(200).json({ message: "Deletado" });
+      res.status(200).json({ message: 'Deletado' });
     } else {
-      error = errorHandling.createError("Esta corrida já foi aceita!", 422);
+      error = errorHandling.createError('Esta corrida já foi aceita!', 422);
       throw error;
     }
   } catch (err) {
@@ -255,7 +255,7 @@ async function handleDispatch(corrida, cliente) {
 
     //motoqueiros conectados
     let socket = io.getIO();
-    const drivers = socket.of("/drivers").connected;
+    const drivers = socket.of('/drivers').connected;
     if (socket.engine.clientsCount > 0) {
       let distances = [];
 
@@ -268,7 +268,7 @@ async function handleDispatch(corrida, cliente) {
         });
         if (!location) {
           error = errorHandling.createError(
-            "Localização do motoqueiro não encontrada.",
+            'Localização do motoqueiro não encontrada.',
             404
           );
           //throw error;
@@ -324,11 +324,11 @@ async function handleDispatch(corrida, cliente) {
       }
       // caso não haja nenhum motoqueiro disponível, cancelar a corrida
       if (!accepted) {
-        socket.sockets.in(corrida.idCliente).emit("cancelCorrida");
+        socket.sockets.in(corrida.idCliente).emit('cancelCorrida');
         return;
       }
     } else {
-      socket.sockets.in(corrida.idCliente).emit("cancelCorrida");
+      socket.sockets.in(corrida.idCliente).emit('cancelCorrida');
     }
   } catch (err) {
     console.log(err);
@@ -337,11 +337,11 @@ async function handleDispatch(corrida, cliente) {
 
 function handleSocket(socket, corrida, distance, cliente) {
   return new Promise((resolve, reject) => {
-    socket.emit("dispatch", { corrida, distance, cliente }, reply => {
+    socket.emit('dispatch', { corrida, distance, cliente }, reply => {
       console.log(reply);
-      if (reply === "accept") {
+      if (reply === 'accept') {
         resolve(true);
-      } else if (reply === "reject") {
+      } else if (reply === 'reject') {
         reject();
       }
     });
