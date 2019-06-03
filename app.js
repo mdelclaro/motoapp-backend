@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const multer = require('multer');
 const path = require('path');
 const uuidv4 = require('uuid/v4');
-const morgan = require('morgan');
+
 require('dotenv-safe').config();
 
 const { mongodbUrl } = require('./src/utils/config');
@@ -44,8 +44,6 @@ const fileFilter = (req, file, cb) => {
 };
 
 const app = express();
-
-if (!process.env.NODE_ENV) app.use(morgan('combined'));
 
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
