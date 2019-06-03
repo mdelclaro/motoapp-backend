@@ -1,13 +1,13 @@
 const { validationResult } = require("express-validator/check");
 const ObjectId = require("mongoose").Types.ObjectId;
 
-const { Avalicao, Motoqueiro } = require("../models");
+const { Avaliacao, Motoqueiro } = require("../models");
 const { errorHandling } = require("../utils");
 
 // Buscar Avaliacoes
 exports.getAvaliacoes = async (req, res, next) => {
   try {
-    const avaliacoes = await Avalicao.find();
+    const avaliacoes = await Avaliacao.find();
     if (!avaliacoes) {
       error = errorHandling.createError("Nenhuma avaliação encontrada.", 404);
       throw error;
@@ -30,7 +30,7 @@ exports.getAvaliacao = async (req, res, next) => {
       error = errorHandling.createError("ID inválido", 422);
       throw error;
     }
-    const avaliacao = await Avalicao.findById(idAvaliacao);
+    const avaliacao = await Avaliacao.findById(idAvaliacao);
     if (!avaliacao) {
       error = errorHandling.createError("Nenhuma avaliação encontrada.", 404);
       throw error;
@@ -67,7 +67,7 @@ exports.createAvaliacao = async (req, res, next) => {
       throw error;
     }
 
-    const avaliacao = new Avalicao({
+    const avaliacao = new Avaliacao({
       nota,
       comentario,
       idMotoqueiro,

@@ -13,9 +13,8 @@ module.exports = (req, res, next) => {
   try {
     decodedToken = jwt.verify(token, publicKey, { algorithms: "RS256" });
   } catch (err) {
-    if (!err.message === "jwt expired") {
-      err.message = "Invalid Token";
-    }
+    if (!err.message === "jwt expired") err.message = "Token expired";
+    else err.message = "Invalid Token";
     err.statusCode = 500;
     throw err;
   }

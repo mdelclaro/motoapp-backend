@@ -6,7 +6,7 @@ const multer = require("multer");
 const path = require("path");
 const uuidv4 = require("uuid/v4");
 const morgan = require("morgan");
-require("dotenv").config();
+require("dotenv-safe").config();
 
 const { mongodbUrl } = require("./src/utils/config");
 

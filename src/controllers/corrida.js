@@ -62,9 +62,20 @@ exports.createCorrida = async (req, res, next) => {
     const destino = req.body.destino;
     const distancia = req.body.distancia;
     const tempo = req.body.tempo;
-    const idCliente = req.userId;
-    // const idCliente = req.body.idCliente;
+    // const idCliente = req.userId;
+    const idCliente = req.body.idCliente;
     const status = 0;
+
+    //calcular valor
+    let valor;
+    if (tempo < 7) {
+      valor = 5;
+    } else if (tempo > 7 && tempo < 13) {
+      valor = 6;
+    } else if (tempo > 13 && tempo < 18) {
+      valor = 7;
+    } else if (tempo > 18) {
+    }
 
     const corrida = new Corrida({
       origem,
@@ -114,10 +125,10 @@ exports.updateCorrida = async (req, res, next) => {
 
     const idCliente = corrida.idCliente.toString();
 
-    if (idCliente !== userId) {
-      error = errorHandling.createError("Não autorizado", 403);
-      throw error;
-    }
+    // if (idCliente !== userId) {
+    //   error = errorHandling.createError("Não autorizado", 403);
+    //   throw error;
+    // }
 
     corrida.idMotoqueiro = idMotoqueiro ? idMotoqueiro : corrida.idMotoqueiro;
     corrida.status = status;
@@ -271,7 +282,6 @@ async function handleDispatch(corrida, cliente) {
             originCoordinates,
             1
           );
-          console.log(distance);
           distances.push({ userId: idMotoqueiro, distance, socket });
         }
       }

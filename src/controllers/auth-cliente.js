@@ -55,8 +55,7 @@ exports.login = async (req, res, next) => {
       token,
       refreshToken,
       expiryDate: expiryDate.toString(),
-      userId: cliente._id.toString(),
-      imgPerfil: cliente.imgPerfil
+      userId: cliente._id.toString()
     });
     return;
   } catch (err) {
