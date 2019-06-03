@@ -1,14 +1,14 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
-const bodyParser = require("body-parser");
-const multer = require("multer");
-const path = require("path");
-const uuidv4 = require("uuid/v4");
-const morgan = require("morgan");
-require("dotenv-safe").config();
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const bodyParser = require('body-parser');
+const multer = require('multer');
+const path = require('path');
+const uuidv4 = require('uuid/v4');
+const morgan = require('morgan');
+require('dotenv-safe').config();
 
-const { mongodbUrl } = require("./src/utils/config");
+const { mongodbUrl } = require('./src/utils/config');
 
 // Rotas
 const {
@@ -20,22 +20,22 @@ const {
   authRoute,
   chatRoute,
   mensagemRoute
-} = require("./src/routes");
+} = require('./src/routes');
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "images");
+    cb(null, 'images');
   },
   filename: (req, file, cb) => {
-    cb(null, uuidv4() + ".png");
+    cb(null, uuidv4() + '.png');
   }
 });
 
 const fileFilter = (req, file, cb) => {
   if (
-    file.mimetype === "image/png" ||
-    file.mimetype === "image/jpg" ||
-    file.mimetype === "image/jpeg"
+    file.mimetype === 'image/png' ||
+    file.mimetype === 'image/jpg' ||
+    file.mimetype === 'image/jpeg'
   ) {
     cb(null, true);
   } else {
@@ -45,7 +45,8 @@ const fileFilter = (req, file, cb) => {
 
 const app = express();
 
-app.use(morgan("combined"));
+if (!process.env.NODE_ENV) app.use(morgan('combined'));
+
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -53,34 +54,34 @@ app.use(bodyParser.json());
 // image upload
 app.use(
   multer({ storage, fileFilter }).fields([
-    { name: "imgPerfil" },
-    { name: "cnh1" },
-    { name: "cnh2" }
+    { name: 'imgPerfil' },
+    { name: 'cnh1' },
+    { name: 'cnh2' }
   ])
 );
 
 // Servir imagens
 app.use(
-  "/images",
-  express.static(path.join(__dirname, "images"), { fallthrough: true })
+  '/images',
+  express.static(path.join(__dirname, 'images'), { fallthrough: true })
 );
 
 // Imagem não encontrada
-app.get("/images*", (req, res) => {
+app.get('/images*', (req, res) => {
   res
     .status(200)
-    .sendFile(path.resolve() + path.sep + "images" + path.sep + "avatar.png");
+    .sendFile(path.resolve() + path.sep + 'images' + path.sep + 'avatar.png');
 });
 
 // Rotas
-app.use("/v1/corrida", corridaRoutes);
-app.use("/v1/usuario/cliente", clienteRoutes);
-app.use("/v1/usuario/motoqueiro", motoqueiroRoutes);
-app.use("/v1/location", motoqueiroLocationRoutes);
-app.use("/v1/avaliacao", avaliacaoRoutes);
-app.use("/v1/auth", authRoute);
-app.use("/v1/chat", chatRoute);
-app.use("/v1/mensagem", mensagemRoute);
+app.use('/v1/corrida', corridaRoutes);
+app.use('/v1/usuario/cliente', clienteRoutes);
+app.use('/v1/usuario/motoqueiro', motoqueiroRoutes);
+app.use('/v1/location', motoqueiroLocationRoutes);
+app.use('/v1/avaliacao', avaliacaoRoutes);
+app.use('/v1/auth', authRoute);
+app.use('/v1/chat', chatRoute);
+app.use('/v1/mensagem', mensagemRoute);
 
 // tratamento de erros
 app.use((error, req, res, next) => {
@@ -91,7 +92,7 @@ app.use((error, req, res, next) => {
 });
 
 app.use((req, res) => {
-  res.status(404).json({ message: "URL inválida" });
+  res.status(404).json({ message: 'URL inválida' });
 });
 
 // mongoDB && init server
@@ -99,19 +100,19 @@ mongoose
   .connect(mongodbUrl, { useNewUrlParser: true })
   .then(() => {
     const server = app.listen(8080);
-    const io = require("./src/utils/socket").init(server);
+    const io = require('./src/utils/socket').init(server);
 
     //clientes
-    io.sockets.on("connection", socket => {
-      socket.on("join", data => {
+    io.sockets.on('connection', socket => {
+      socket.on('join', data => {
         socket.join(data.id);
       });
-      socket.on("disconnect", () => {
+      socket.on('disconnect', () => {
         socket.removeAllListeners();
       });
 
       // mandar lista de motoqueiros quando se conectar
-      const drivers = io.of("/drivers").connected;
+      const drivers = io.of('/drivers').connected;
       let driversList = [];
       if (Object.keys(drivers).length > 0) {
         for (let key in drivers) {
@@ -120,21 +121,21 @@ mongoose
             coords: drivers[key].coords
           });
         }
-        io.sockets.emit("fetchMotoqueiros", {
+        io.sockets.emit('fetchMotoqueiros', {
           motoqueiros: driversList
         });
       }
     });
     //drivers
-    io.of("/drivers").on("connection", socket => {
-      socket.on("join", data => {
+    io.of('/drivers').on('connection', socket => {
+      socket.on('join', data => {
         socket.userId = data.id.toString();
         socket.coords = data.coords;
         socket.join(socket.userId);
       });
-      socket.on("disconnect", () => {
+      socket.on('disconnect', () => {
         socket.removeAllListeners();
       });
     });
   })
-  .catch(err => console.log("Erro mongoDB: " + err));
+  .catch(err => console.log('Erro mongoDB: ' + err));
