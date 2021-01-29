@@ -5,7 +5,7 @@ Back-end application to serve the mobile apps
 * [Driver's app](https://github.com/mdelclaro/motoappdriver-mobile)
 * [Client's app](https://github.com/mdelclaro/motoapp-mobile)
 
-### Running:
+### Running the application:
 ``` 
 $ npm install
 $ npm start
